@@ -2,9 +2,13 @@
     <item android:id="@+id/nav_home"
         android:title="Home"
         android:icon="@drawable/ic_home"/>
-    <item android:id="@+id/nav_routine"
-        android:title="Routine"
+    <item android:id="@+id/nav_task"
+        android:title="Task"
         android:icon="@drawable/ic_calendar"/>
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_person"
+        android:title="Profile" />
     <item android:id="@+id/nav_logout"
         android:title="Log Out"
         android:icon="@drawable/ic_logout"/>

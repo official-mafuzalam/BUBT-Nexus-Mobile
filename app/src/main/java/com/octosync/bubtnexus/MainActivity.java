@@ -87,15 +87,26 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.btnCommunity).setOnClickListener(v -> openSection("Community"));
         findViewById(R.id.btnEvents).setOnClickListener(v -> openSection("Events"));
-        findViewById(R.id.btnProfile).setOnClickListener(v -> openSection("Profile"));
+        findViewById(R.id.btnProfile).setOnClickListener(v -> {
+            navigateToProfileActivity();
+        });
         etSearch.setOnClickListener(v -> showToast("Search opened"));
     }
 
     private void setupBottomNavigation() {
+        // Set home as selected by default
+        bottomNavigation.setSelectedItemId(R.id.nav_home);
+
         bottomNavigation.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home) {
-                showToast("Home selected");
+                // Already on home page
+                return true;
+            } else if (id == R.id.nav_task) {
+                navigateToTaskActivity();
+                return true;
+            } else if (id == R.id.nav_profile) {
+                navigateToProfileActivity();
                 return true;
             } else if (id == R.id.nav_logout) {
                 logoutUser();
@@ -103,6 +114,18 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
+    }
+
+    private void navigateToTaskActivity() {
+        Intent intent = new Intent(MainActivity.this, TaskActivity.class);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
+    }
+
+    private void navigateToProfileActivity() {
+        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
     }
 
     private void logoutUser() {

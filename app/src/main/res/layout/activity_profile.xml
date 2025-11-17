@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/primary_color"
+    tools:context=".ProfileActivity">
+
+    <!-- Header Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="32dp"
+        android:paddingBottom="16dp">
+
+        <!-- Back Button and Title -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/white" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="My Profile"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:layout_marginStart="16dp"/>
+
+            <View
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+
+        </LinearLayout>
+
+        <!-- Date -->
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Monday, 15 January"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:alpha="0.8"
+            android:layout_marginStart="24dp"
+            android:fontFamily="sans-serif"/>
+
+    </LinearLayout>
+
+    <!-- Content Card -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:cardCornerRadius="32dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardElevation="8dp"
+        android:layout_marginTop="16dp">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Profile Header Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="32dp">
+
+                    <!-- Profile Picture -->
+                    <ImageView
+                        android:id="@+id/ivProfile"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:src="@drawable/ic_person"
+                        app:tint="@color/primary_color"
+                        android:background="@drawable/circle_background"
+                        android:padding="20dp"
+                        android:layout_marginBottom="16dp"/>
+
+                    <!-- Name -->
+                    <TextView
+                        android:id="@+id/tvUserName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rahat Hasan"
+                        android:textColor="@color/text_primary"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginBottom="4dp"/>
+
+                    <!-- Student ID -->
+                    <TextView
+                        android:id="@+id/tvStudentId"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ID: 2023-123-456"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif"
+                        android:layout_marginBottom="8dp"/>
+
+                    <!-- Department -->
+                    <TextView
+                        android:id="@+id/tvDepartment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CSE"
+                        android:textColor="@color/primary_color"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif"
+                        android:background="@drawable/department_background"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="8dp"/>
+
+                </LinearLayout>
+
+                <!-- Info Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="24dp"
+                    android:paddingBottom="24dp">
+
+                    <!-- Section Title -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Personal Information"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginBottom="16dp"/>
+
+                    <!-- Email Info Card -->
+                    <LinearLayout
+                        android:id="@+id/emailCard"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="12dp"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_email"
+                            app:tint="@color/text_secondary"
+                            android:layout_marginEnd="16dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Email"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp"
+                                android:fontFamily="sans-serif"/>
+
+                            <TextView
+                                android:id="@+id/tvEmail"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="rahat@student.edu"
+                                android:textColor="@color/text_primary"
+                                android:textSize="14sp"
+                                android:fontFamily="sans-serif-medium"/>
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_edit"
+                            app:tint="@color/primary_color"/>
+
+                    </LinearLayout>
+
+                    <!-- Phone Info Card -->
+                    <LinearLayout
+                        android:id="@+id/phoneCard"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="12dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:layout_marginTop="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_phone"
+                            app:tint="@color/text_secondary"
+                            android:layout_marginEnd="16dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Phone"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp"
+                                android:fontFamily="sans-serif"/>
+
+                            <TextView
+                                android:id="@+id/tvPhone"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="+880 1234 567890"
+                                android:textColor="@color/text_primary"
+                                android:textSize="14sp"
+                                android:fontFamily="sans-serif-medium"/>
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_edit"
+                            app:tint="@color/primary_color"/>
+
+                    </LinearLayout>
+
+                    <!-- Semester Info Card -->
+                    <LinearLayout
+                        android:id="@+id/semesterCard"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="12dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:layout_marginTop="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_school"
+                            app:tint="@color/text_secondary"
+                            android:layout_marginEnd="16dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Semester"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp"
+                                android:fontFamily="sans-serif"/>
+
+                            <TextView
+                                android:id="@+id/tvSemester"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="8th Semester"
+                                android:textColor="@color/text_primary"
+                                android:textSize="14sp"
+                                android:fontFamily="sans-serif-medium"/>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Batch Info Card -->
+                    <LinearLayout
+                        android:id="@+id/batchCard"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="12dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:layout_marginTop="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_groups"
+                            app:tint="@color/text_secondary"
+                            android:layout_marginEnd="16dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Batch"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp"
+                                android:fontFamily="sans-serif"/>
+
+                            <TextView
+                                android:id="@+id/tvBatch"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2020-21"
+                                android:textColor="@color/text_primary"
+                                android:textSize="14sp"
+                                android:fontFamily="sans-serif-medium"/>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Action Buttons -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="24dp">
+
+                        <!-- Edit Profile Button -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnEditProfile"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Edit Profile"
+                            android:textColor="@color/primary_color"
+                            android:backgroundTint="@color/white"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            app:strokeColor="@color/primary_color"
+                            app:strokeWidth="1dp"
+                            app:cornerRadius="12dp"
+                            android:layout_marginEnd="8dp"/>
+
+                        <!-- Settings Button -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnSettings"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Settings"
+                            android:textColor="@color/white"
+                            android:backgroundTint="@color/primary_color"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="12dp"
+                            android:layout_marginStart="8dp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="labeled"
+        app:itemIconTint="@color/nav_color_state"
+        app:itemTextColor="@color/nav_color_state"/>
+
+</LinearLayout>
