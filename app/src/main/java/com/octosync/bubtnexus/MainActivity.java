@@ -160,23 +160,46 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // Token is valid, update user data if needed
                     UserResponse userResponse = response.body();
-                    if (userResponse.getUser() != null) {
+
+                    // Check if the API call was successful and data exists
+                    if (userResponse.isSuccess() && userResponse.getData() != null && userResponse.getData().getUser() != null) {
                         String currentUserName = sessionManager.getUserName();
-                        String newUserName = userResponse.getUser().getName();
+                        String newUserName = userResponse.getData().getUser().getName();
 
                         // Update if user name changed or not stored
                         if (currentUserName == null || !currentUserName.equals(newUserName)) {
                             sessionManager.saveUserData(
-                                    userResponse.getUser().getName(),
-                                    userResponse.getUser().getEmail()
+                                    userResponse.getData().getUser().getName(),
+                                    userResponse.getData().getUser().getEmail(),
+                                    userResponse.getData().getUser().getUserType(),
+                                    userResponse.getData().getUser().isStudent(),
+                                    userResponse.getData().getUser().isFaculty()
                             );
+
+                            // Update roles if available
+                            if (userResponse.getData().getUser().getRoles() != null) {
+                                sessionManager.saveUserRoles(userResponse.getData().getUser().getRoles());
+                            }
+
                             tvWelcome.setText("Welcome, " + newUserName + "!");
                         }
+                    } else {
+                        // API returned success: false or no user data
+                        if (userResponse.getMessage() != null) {
+                            showToast(userResponse.getMessage());
+                        }
+                        // Token might be invalid, redirect to login
+                        sessionManager.clear();
+                        redirectToLogin();
                     }
                 } else {
-                    // Token is invalid, redirect to login
+                    // HTTP error (401, 500, etc.)
+                    if (response.code() == 401) {
+                        showToast("Session expired. Please login again.");
+                    } else {
+                        showToast("Failed to verify user. Please try again.");
+                    }
                     sessionManager.clear();
                     redirectToLogin();
                 }
@@ -186,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(Call<UserResponse> call, Throwable t) {
                 // Network error, but we'll keep the user logged in with stored data
                 showToast("Network error, but you can continue using the app");
+                // You might want to show a subtle indicator that data might be outdated
             }
         });
     }

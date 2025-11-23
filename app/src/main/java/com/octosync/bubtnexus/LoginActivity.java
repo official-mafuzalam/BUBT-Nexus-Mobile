@@ -37,17 +37,13 @@ public class LoginActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
 
         // Check if user is already logged in
-        if (isUserLoggedIn()) {
+        if (sessionManager.isLoggedIn()) {
             redirectToMainActivity();
             return;
         }
 
         initializeViews();
         setupListeners();
-    }
-
-    private boolean isUserLoggedIn() {
-        return sessionManager.getToken() != null;
     }
 
     private void redirectToMainActivity() {
@@ -85,6 +81,11 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            showError("Please enter a valid email address");
+            return;
+        }
+
         progressBar.setVisibility(View.VISIBLE);
         buttonLogin.setEnabled(false);
 
@@ -99,23 +100,58 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null) {
                     LoginResponse loginResponse = response.body();
-                    String token = "Bearer " + loginResponse.getAccessToken();
 
-                    // Save both token and user data
-                    sessionManager.saveToken(token);
-                    sessionManager.saveUserData(
-                            loginResponse.getUser().getName(),
-                            loginResponse.getUser().getEmail()
-                    );
+                    if (loginResponse.isSuccess() && loginResponse.getData() != null) {
+                        String token = loginResponse.getData().getTokenType() + " " + loginResponse.getData().getAccessToken();
+                        LoginResponse.User user = loginResponse.getData().getUser();
 
-                    Toast.makeText(LoginActivity.this,
-                            "Welcome " + loginResponse.getUser().getName(),
-                            Toast.LENGTH_SHORT).show();
+                        // Save user data to session
+                        sessionManager.saveToken(token);
+                        sessionManager.saveUserId(user.getId());
+                        sessionManager.saveUserData(
+                                user.getName(),
+                                user.getEmail(),
+                                user.getUserType(),
+                                user.isStudent(),
+                                user.isFaculty()
+                        );
 
-                    redirectToMainActivity();
+                        // Save user details if available
+                        if (user.getDetails() != null) {
+                            sessionManager.saveUserDetails(user.getDetails());
+                        }
 
+                        if (user.getRoles() != null) {
+                            sessionManager.saveUserRoles(user.getRoles());
+                        }
+
+                        Toast.makeText(LoginActivity.this,
+                                "Welcome " + user.getName(),
+                                Toast.LENGTH_SHORT).show();
+
+                        redirectToMainActivity();
+
+                    } else {
+                        String errorMessage = loginResponse.getMessage() != null ?
+                                loginResponse.getMessage() : "Login failed";
+                        showError(errorMessage);
+                    }
                 } else {
-                    showError("Invalid email or password. Please try again.");
+                    // Handle HTTP error responses
+                    switch (response.code()) {
+                        case 401:
+                            showError("Invalid email or password");
+                            break;
+                        case 422:
+                            showError("Validation error. Please check your input.");
+                            break;
+                        case 500:
+                            showError("Server error. Please try again later.");
+                            break;
+                        default:
+                            showError("Login failed. Please try again.");
+                            break;
+                    }
                 }
             }
 

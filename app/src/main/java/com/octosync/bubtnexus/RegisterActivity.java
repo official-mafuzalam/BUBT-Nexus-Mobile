@@ -104,29 +104,59 @@ public class RegisterActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null) {
                     LoginResponse registerResponse = response.body();
-                    String token = "Bearer " + registerResponse.getAccessToken();
 
-                    // Save both token and user data
-                    sessionManager.saveToken(token);
-                    sessionManager.saveUserData(
-                            registerResponse.getUser().getName(),
-                            registerResponse.getUser().getEmail()
-                    );
+                    if (registerResponse.isSuccess() && registerResponse.getData() != null) {
+                        String token = registerResponse.getData().getTokenType() + " " + registerResponse.getData().getAccessToken();
+                        LoginResponse.User user = registerResponse.getData().getUser();
 
-                    Toast.makeText(RegisterActivity.this,
-                            "Registration successful! Welcome " + registerResponse.getUser().getName(),
-                            Toast.LENGTH_SHORT).show();
+                        // Save user data to session
+                        sessionManager.saveToken(token);
+                        sessionManager.saveUserId(user.getId());
+                        sessionManager.saveUserData(
+                                user.getName(),
+                                user.getEmail(),
+                                user.getUserType(),
+                                user.isStudent(),
+                                user.isFaculty()
+                        );
 
-                    Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                        // Save user details if available
+                        if (user.getDetails() != null) {
+                            sessionManager.saveUserDetails(user.getDetails());
+                        }
 
+                        if (user.getRoles() != null) {
+                            sessionManager.saveUserRoles(user.getRoles());
+                        }
+
+                        Toast.makeText(RegisterActivity.this,
+                                "Registration successful! Welcome " + user.getName(),
+                                Toast.LENGTH_SHORT).show();
+
+                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+
+                    } else {
+                        String errorMessage = registerResponse.getMessage() != null ?
+                                registerResponse.getMessage() : "Registration failed";
+                        showError(errorMessage);
+                    }
                 } else {
                     // Handle specific error messages from server
-                    if (response.code() == 422) {
-                        showError("Email already exists. Please use a different email.");
-                    } else {
-                        showError("Registration failed. Please try again.");
+                    switch (response.code()) {
+                        case 422:
+                            showError("Email already exists. Please use a different email.");
+                            break;
+                        case 400:
+                            showError("Bad request. Please check your input.");
+                            break;
+                        case 500:
+                            showError("Server error. Please try again later.");
+                            break;
+                        default:
+                            showError("Registration failed. Please try again.");
+                            break;
                     }
                 }
             }

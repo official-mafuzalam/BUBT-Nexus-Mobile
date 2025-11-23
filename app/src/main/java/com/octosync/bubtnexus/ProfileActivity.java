@@ -23,7 +23,7 @@ public class ProfileActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigation;
     private SessionManager sessionManager;
     private TextView tvUserName, tvStudentId, tvDepartment, tvEmail, tvPhone, tvSemester, tvBatch, tvDate;
-    private MaterialButton btnEditProfile, btnSettings; // Changed from ImageButton to MaterialButton
+    private MaterialButton btnEditProfile, btnSettings;
     private ImageButton btnBack;
 
     @Override
@@ -51,23 +51,23 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void initializeViews() {
-            // TextViews
-            tvUserName = findViewById(R.id.tvUserName);
-            tvStudentId = findViewById(R.id.tvStudentId);
-            tvDepartment = findViewById(R.id.tvDepartment);
-            tvEmail = findViewById(R.id.tvEmail);
-            tvPhone = findViewById(R.id.tvPhone);
-            tvSemester = findViewById(R.id.tvSemester);
-            tvBatch = findViewById(R.id.tvBatch);
-            tvDate = findViewById(R.id.tvDate);
+        // TextViews
+        tvUserName = findViewById(R.id.tvUserName);
+        tvStudentId = findViewById(R.id.tvStudentId);
+        tvDepartment = findViewById(R.id.tvDepartment);
+        tvEmail = findViewById(R.id.tvEmail);
+        tvPhone = findViewById(R.id.tvPhone);
+        tvSemester = findViewById(R.id.tvSemester);
+        tvBatch = findViewById(R.id.tvBatch);
+        tvDate = findViewById(R.id.tvDate);
 
-            // Buttons - IMPORTANT: These are MaterialButtons, not ImageButtons
-            btnBack = findViewById(R.id.btnBack);
-            btnEditProfile = findViewById(R.id.btnEditProfile);
-            btnSettings = findViewById(R.id.btnSettings);
+        // Buttons
+        btnBack = findViewById(R.id.btnBack);
+        btnEditProfile = findViewById(R.id.btnEditProfile);
+        btnSettings = findViewById(R.id.btnSettings);
 
-            // Bottom Navigation
-            bottomNavigation = findViewById(R.id.bottomNavigation);
+        // Bottom Navigation
+        bottomNavigation = findViewById(R.id.bottomNavigation);
     }
 
     private void setupClickListeners() {
@@ -82,16 +82,13 @@ public class ProfileActivity extends AppCompatActivity {
 
         btnEditProfile.setOnClickListener(v -> {
             showToast("Edit Profile clicked");
+            // Navigate to EditProfileActivity when ready
         });
 
-        // Settings button - Add temporary button if not found
         if (btnSettings != null) {
             btnSettings.setOnClickListener(v -> {
                 showToast("Settings clicked");
             });
-        } else {
-            Log.w(TAG, "Settings button not found in XML");
-            // You can programmatically create a button here if needed
         }
     }
 
@@ -150,6 +147,13 @@ public class ProfileActivity extends AppCompatActivity {
             // Get user data from session
             String userName = sessionManager.getUserName();
             String userEmail = sessionManager.getUserEmail();
+            String studentId = sessionManager.getStudentId();
+            String department = sessionManager.getDepartment();
+            String phone = sessionManager.getPhone();
+            String semester = sessionManager.getSemester();
+            String program = sessionManager.getProgram();
+            String facultyId = sessionManager.getFacultyId();
+            String designation = sessionManager.getDesignation();
 
             // Set basic user info
             if (tvUserName != null && userName != null) {
@@ -160,12 +164,35 @@ public class ProfileActivity extends AppCompatActivity {
                 tvEmail.setText(userEmail);
             }
 
-            // Set placeholder values
-            if (tvStudentId != null) tvStudentId.setText("ID: 2023-123-456");
-            if (tvDepartment != null) tvDepartment.setText("Computer Science & Engineering");
-            if (tvPhone != null) tvPhone.setText("+880 1234 567890");
-            if (tvSemester != null) tvSemester.setText("8th Semester");
-            if (tvBatch != null) tvBatch.setText("2020-21");
+            // Set user details with fallback values
+            if (tvStudentId != null) {
+                String displayStudentId = studentId != null ? studentId :
+                        (facultyId != null ? facultyId : "Not assigned");
+                tvStudentId.setText(displayStudentId);
+            }
+
+            if (tvDepartment != null) {
+                String displayDepartment = department != null ? department :
+                        (program != null ? program : "Not specified");
+                tvDepartment.setText(displayDepartment);
+            }
+
+            if (tvPhone != null) {
+                String displayPhone = phone != null ? phone : "Not provided";
+                tvPhone.setText(displayPhone);
+            }
+
+            if (tvSemester != null) {
+                String displaySemester = semester != null ? semester + " Semester" :
+                        (designation != null ? designation : "Not specified");
+                tvSemester.setText(displaySemester);
+            }
+
+            if (tvBatch != null) {
+                // You might want to calculate batch from intake or use another field
+                String batch = "2020-21"; // Default or calculate from intake
+                tvBatch.setText(batch);
+            }
 
         } catch (Exception e) {
             Log.e(TAG, "loadUserData: Error", e);
