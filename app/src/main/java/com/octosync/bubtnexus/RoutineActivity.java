@@ -168,9 +168,14 @@ public class RoutineActivity extends AppCompatActivity {
         }
 
         // Get program info from session
-        String program = sessionManager.getProgram() != null ? sessionManager.getProgram() : "019";
-        String semester = sessionManager.getSemester() != null ? sessionManager.getSemester() : "611";
+//        String program = sessionManager.getProgram() != null ? sessionManager.getProgram() : "019";
+//        String semester = sessionManager.getSemester() != null ? sessionManager.getSemester() : "611";
         String intake = sessionManager.getIntake() != null ? sessionManager.getIntake() : "49 - 1";
+
+        //program info for test
+        String program = "019";
+        String semester = "611";
+//        String intake = "49 - 1";
 
         Log.d(TAG, "Loading routine - Program: " + program + ", Semester: " + semester + ", Intake: " + intake);
 
@@ -185,7 +190,7 @@ public class RoutineActivity extends AppCompatActivity {
                     if (routineResponse.isStatus()) {
                         displayRoutineData(routineResponse);
                     } else {
-                        showError("No routine data available for your program");
+                        showError("No routine data available for your program for intake: " + intake);
                     }
                 } else {
                     handleApiError(response);

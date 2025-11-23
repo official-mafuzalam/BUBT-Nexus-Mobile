@@ -2,10 +2,13 @@ package com.octosync.bubtnexus.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
+
+import com.octosync.bubtnexus.models.LoginResponse;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import com.octosync.bubtnexus.models.LoginResponse; // Add this import
 
 public class SessionManager {
     private static final String PREF_NAME = "user_session";
@@ -33,7 +36,7 @@ public class SessionManager {
     private static final String KEY_ADDRESS = "address";
     private static final String KEY_DATE_OF_BIRTH = "date_of_birth";
     private static final String KEY_EMERGENCY_CONTACT = "emergency_contact";
-    private static final String KEY_PROFILE_PICTURE = "profile_picture";
+    private static final String KEY_PROFILE_PICTURE_URI = "profile_picture_uri";
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -67,7 +70,6 @@ public class SessionManager {
         editor.apply();
     }
 
-    // Updated method to use LoginResponse.User.UserDetails
     public void saveUserDetails(LoginResponse.User.UserDetails details) {
         if (details != null) {
             editor.putString(KEY_SEMESTER, details.getSemester());
@@ -83,7 +85,6 @@ public class SessionManager {
             editor.putString(KEY_ADDRESS, details.getAddress());
             editor.putString(KEY_DATE_OF_BIRTH, details.getDateOfBirth());
             editor.putString(KEY_EMERGENCY_CONTACT, details.getEmergencyContact());
-            editor.putString(KEY_PROFILE_PICTURE, details.getProfilePicture());
 
             if (details.getCgpa() != null) {
                 editor.putFloat(KEY_CGPA, details.getCgpa().floatValue());
@@ -92,6 +93,21 @@ public class SessionManager {
             }
             editor.apply();
         }
+    }
+
+    // Profile Picture Methods (Local storage only)
+    public void saveProfilePictureUri(String uriString) {
+        editor.putString(KEY_PROFILE_PICTURE_URI, uriString);
+        editor.apply();
+    }
+
+    public String getProfilePictureUri() {
+        return sharedPreferences.getString(KEY_PROFILE_PICTURE_URI, null);
+    }
+
+    public void removeProfilePicture() {
+        editor.remove(KEY_PROFILE_PICTURE_URI);
+        editor.apply();
     }
 
     public String getUserName() {
@@ -186,10 +202,6 @@ public class SessionManager {
         return sharedPreferences.getString(KEY_EMERGENCY_CONTACT, null);
     }
 
-    public String getProfilePicture() {
-        return sharedPreferences.getString(KEY_PROFILE_PICTURE, null);
-    }
-
     public Float getCgpa() {
         if (sharedPreferences.contains(KEY_CGPA)) {
             return sharedPreferences.getFloat(KEY_CGPA, 0.0f);
@@ -224,4 +236,35 @@ public class SessionManager {
         editor.putString(KEY_USER_EMAIL, email);
         editor.apply();
     }
+
+    public void updateUserPhone(String phone) {
+        editor.putString(KEY_PHONE, phone);
+        editor.apply();
+    }
+
+    public void updateStudentId(String studentId) {
+        editor.putString(KEY_STUDENT_ID, studentId);
+        editor.apply();
+    }
+
+    public void updateUserDepartment(String department) {
+        editor.putString(KEY_DEPARTMENT, department);
+        editor.apply();
+    }
+
+    public void updateUserSemester(String semester) {
+        editor.putString(KEY_SEMESTER, semester);
+        editor.apply();
+    }
+
+    public void updateIntake(String intake) {
+        editor.putString(KEY_INTAKE, intake);
+        editor.apply();
+    }
+
+    public void updateUserAddress(String address) {
+        editor.putString(KEY_ADDRESS, address);
+        editor.apply();
+    }
+
 }

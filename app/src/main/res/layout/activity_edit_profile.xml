@@ -197,10 +197,10 @@
                     style="@style/TextInputLayoutStyle">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etBatch"
+                        android:id="@+id/etIntake"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Batch"
+                        android:hint="Intake"
                         android:textSize="16sp" />
 
                 </com.google.android.material.textfield.TextInputLayout>

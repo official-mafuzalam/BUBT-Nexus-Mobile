@@ -54,17 +54,27 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
             textPublishedDate = itemView.findViewById(R.id.textPublishedDate);
             textViewLink = itemView.findViewById(R.id.textViewLink);
 
+            // Set click listener for the entire item
             itemView.setOnClickListener(v -> {
-                int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    Notice notice = (Notice) itemView.getTag();
-                    if (notice != null) {
-                        // Open notice link in browser
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(notice.getLink()));
-                        itemView.getContext().startActivity(browserIntent);
-                    }
-                }
+                openLinkInBrowser();
             });
+
+            // Set click listener specifically for the link text
+            textViewLink.setOnClickListener(v -> {
+                openLinkInBrowser();
+            });
+        }
+
+        private void openLinkInBrowser() {
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                Notice notice = (Notice) itemView.getTag();
+                if (notice != null && notice.getLink() != null && !notice.getLink().isEmpty()) {
+                    // Open notice link in browser
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(notice.getLink()));
+                    itemView.getContext().startActivity(browserIntent);
+                }
+            }
         }
 
         public void bind(Notice notice) {
@@ -80,6 +90,8 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
         }
 
         private int getCategoryColor(String category) {
+            if (category == null) return R.color.purple;
+
             switch (category.toLowerCase()) {
                 case "general":
                     return R.color.green;

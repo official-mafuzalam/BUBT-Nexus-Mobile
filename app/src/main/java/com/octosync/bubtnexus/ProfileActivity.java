@@ -1,9 +1,13 @@
 package com.octosync.bubtnexus;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +29,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView tvUserName, tvStudentId, tvDepartment, tvEmail, tvPhone, tvSemester, tvBatch, tvDate;
     private MaterialButton btnEditProfile, btnSettings;
     private ImageButton btnBack;
+    private ImageView ivProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +65,9 @@ public class ProfileActivity extends AppCompatActivity {
         tvSemester = findViewById(R.id.tvSemester);
         tvBatch = findViewById(R.id.tvBatch);
         tvDate = findViewById(R.id.tvDate);
+
+        //ImageVies
+        ivProfile = findViewById(R.id.ivProfile);
 
         // Buttons
         btnBack = findViewById(R.id.btnBack);
@@ -171,6 +179,7 @@ public class ProfileActivity extends AppCompatActivity {
             String program = sessionManager.getProgram();
             String facultyId = sessionManager.getFacultyId();
             String designation = sessionManager.getDesignation();
+            String intake = sessionManager.getIntake();
 
             // Set basic user info
             if (tvUserName != null && userName != null) {
@@ -206,11 +215,21 @@ public class ProfileActivity extends AppCompatActivity {
             }
 
             if (tvBatch != null) {
-                // You might want to calculate batch from intake or use another field
-                String batch = "2020-21"; // Default or calculate from intake
-                tvBatch.setText(batch);
+                tvBatch.setText(intake);
             }
 
+            String profilePictureBase64 = sessionManager.getProfilePictureUri();
+            if (profilePictureBase64 != null && !profilePictureBase64.isEmpty() && ivProfile != null) {
+                try {
+                    byte[] decodedBytes = Base64.decode(profilePictureBase64, Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                    ivProfile.setImageBitmap(bitmap);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error loading profile picture: " + e.getMessage());
+                    // Use default image if there's an error
+                    ivProfile.setImageResource(R.drawable.ic_person);
+                }
+            }
         } catch (Exception e) {
             Log.e(TAG, "loadUserData: Error", e);
         }
