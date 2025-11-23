@@ -81,8 +81,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         btnEditProfile.setOnClickListener(v -> {
-            showToast("Edit Profile clicked");
-            // Navigate to EditProfileActivity when ready
+            navigateToEditProfile();
         });
 
         if (btnSettings != null) {
@@ -91,6 +90,7 @@ public class ProfileActivity extends AppCompatActivity {
             });
         }
     }
+
 
     private void setupBottomNavigation() {
         try {
@@ -127,6 +127,23 @@ public class ProfileActivity extends AppCompatActivity {
         startActivity(intent);
         overridePendingTransition(0, 0);
         finish();
+    }
+
+    // Add this method:
+    private void navigateToEditProfile() {
+        Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+        startActivityForResult(intent, 1001); // Use request code to refresh data when returning
+    }
+
+    // Add this to handle result from EditProfileActivity
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1001 && resultCode == RESULT_OK) {
+            // Refresh user data when returning from edit profile
+            loadUserData();
+            showToast("Profile updated successfully");
+        }
     }
 
     private void logoutUser() {

@@ -16,6 +16,9 @@
         android:theme="@style/Theme.BUBTNexus"
         tools:targetApi="31">
         <activity
+            android:name=".EditProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".RoutineActivity"
             android:exported="false" />
         <activity

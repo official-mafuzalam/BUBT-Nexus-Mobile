@@ -79,7 +79,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        findViewById(R.id.btnRoutine).setOnClickListener(v -> openSection("Routine"));
+        findViewById(R.id.btnRoutine).setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, RoutineActivity.class);
+            startActivity(intent);
+        });
         findViewById(R.id.btnAssignments).setOnClickListener(v -> openSection("Assignments"));
         findViewById(R.id.btnNotices).setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, NoticeActivity.class);
