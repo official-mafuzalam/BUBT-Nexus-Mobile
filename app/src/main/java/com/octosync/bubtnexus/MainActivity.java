@@ -83,7 +83,10 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, RoutineActivity.class);
             startActivity(intent);
         });
-        findViewById(R.id.btnAssignments).setOnClickListener(v -> openSection("Assignments"));
+        findViewById(R.id.btnAssignments).setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, AssignmentActivity.class);
+            startActivity(intent);
+        });
         findViewById(R.id.btnNotices).setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, NoticeActivity.class);
             startActivity(intent);

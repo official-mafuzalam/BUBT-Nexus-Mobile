@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.octosync.bubtnexus.utils.SessionManager;
 
-public class TaskActivity extends AppCompatActivity {
+public class AssignmentActivity extends AppCompatActivity {
 
     // UI Components
     private ProgressBar progressBar;
@@ -37,12 +37,12 @@ public class TaskActivity extends AppCompatActivity {
             return;
         }
 
-        setContentView(R.layout.activity_task);
+        setContentView(R.layout.activity_assignment);
 
         initializeViews();
         setupClickListeners();
         setupBottomNavigation();
-        loadTaskData();
+        loadAssignmentData();
     }
 
     private boolean isUserLoggedIn() {
@@ -50,7 +50,7 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     private void redirectToLogin() {
-        Intent intent = new Intent(TaskActivity.this, LoginActivity.class);
+        Intent intent = new Intent(AssignmentActivity.this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
@@ -68,8 +68,8 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        // Set task as selected by default
-        bottomNavigation.setSelectedItemId(R.id.nav_task);
+        // Set appropriate navigation item as selected
+        bottomNavigation.setSelectedItemId(R.id.nav_home);
 
         bottomNavigation.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -77,7 +77,7 @@ public class TaskActivity extends AppCompatActivity {
                 navigateToMainActivity();
                 return true;
             } else if (id == R.id.nav_task) {
-                // Already on task page
+                navigateToTaskActivity();
                 return true;
             } else if (id == R.id.nav_profile) {
                 navigateToProfileActivity();
@@ -91,14 +91,21 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     private void navigateToMainActivity() {
-        Intent intent = new Intent(TaskActivity.this, MainActivity.class);
+        Intent intent = new Intent(AssignmentActivity.this, MainActivity.class);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
+        finish();
+    }
+
+    private void navigateToTaskActivity() {
+        Intent intent = new Intent(AssignmentActivity.this, TaskActivity.class);
         startActivity(intent);
         overridePendingTransition(0, 0);
         finish();
     }
 
     private void navigateToProfileActivity() {
-        Intent intent = new Intent(TaskActivity.this, ProfileActivity.class);
+        Intent intent = new Intent(AssignmentActivity.this, ProfileActivity.class);
         startActivity(intent);
         overridePendingTransition(0, 0);
         finish();
@@ -111,7 +118,7 @@ public class TaskActivity extends AppCompatActivity {
         redirectToLogin();
     }
 
-    private void loadTaskData() {
+    private void loadAssignmentData() {
         showLoading(true);
 
         // Simulate API call delay for coming soon message
@@ -123,11 +130,15 @@ public class TaskActivity extends AppCompatActivity {
 
     private void showComingSoon() {
         // The coming soon message is already in the layout
-        tvError.setVisibility(View.GONE);
-        progressBar.setVisibility(View.GONE);
+        if (tvError != null) {
+            tvError.setVisibility(View.GONE);
+        }
+        if (progressBar != null) {
+            progressBar.setVisibility(View.GONE);
+        }
 
         // You can show a toast to indicate the feature is coming soon
-        showToast("Task management feature coming soon!");
+        showToast("Assignment feature coming soon!");
     }
 
     private void showLoading(boolean show) {

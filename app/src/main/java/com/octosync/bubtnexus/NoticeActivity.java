@@ -1,42 +1,63 @@
 package com.octosync.bubtnexus;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import com.google.android.material.appbar.MaterialToolbar;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.octosync.bubtnexus.adapters.NoticeAdapter;
 import com.octosync.bubtnexus.models.Notice;
 import com.octosync.bubtnexus.models.NoticesResponse;
 import com.octosync.bubtnexus.network.ApiClient;
 import com.octosync.bubtnexus.network.ApiService;
 import com.octosync.bubtnexus.utils.SessionManager;
+
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import java.util.List;
 
 public class NoticeActivity extends AppCompatActivity {
 
+    // UI Components
     private RecyclerView recyclerViewNotices;
     private ProgressBar progressBar;
-    private TextView textViewError;
+    private TextView tvError;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ImageButton btnBack;
+    private BottomNavigationView bottomNavigation;
+
+    // Adapter and Session
     private NoticeAdapter noticeAdapter;
     private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notice);
 
         sessionManager = new SessionManager(this);
+
+        // Check if user is logged in, if not redirect to login
+        if (!isUserLoggedIn()) {
+            redirectToLogin();
+            return;
+        }
+
+        setContentView(R.layout.activity_notice);
+
         initializeViews();
-        setupToolbar();
+        setupClickListeners();
+        setupBottomNavigation();
         setupRecyclerView();
         loadNotices();
 
@@ -44,34 +65,96 @@ public class NoticeActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(this::loadNotices);
     }
 
-    private void initializeViews() {
-        MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        // Enable back button
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
-
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
-
-        recyclerViewNotices = findViewById(R.id.recyclerViewNotices);
-        progressBar = findViewById(R.id.progressBar);
-        textViewError = findViewById(R.id.textViewError);
-        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+    private boolean isUserLoggedIn() {
+        return sessionManager.getToken() != null;
     }
 
-    private void setupToolbar() {
-        MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    private void redirectToLogin() {
+        Intent intent = new Intent(NoticeActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
+    private void initializeViews() {
+        progressBar = findViewById(R.id.progressBar);
+        tvError = findViewById(R.id.tvError);
+        recyclerViewNotices = findViewById(R.id.recyclerViewNotices);
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+        btnBack = findViewById(R.id.btnBack);
+        bottomNavigation = findViewById(R.id.bottomNavigation);
+    }
 
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+    private void setupClickListeners() {
+        btnBack.setOnClickListener(v -> finish());
+    }
+
+    private void setupBottomNavigation() {
+        // Set appropriate navigation item as selected
+        bottomNavigation.setSelectedItemId(R.id.nav_home);
+
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                navigateToMainActivity();
+                return true;
+            } else if (id == R.id.nav_task) {
+                navigateToTaskActivity();
+                return true;
+            } else if (id == R.id.nav_profile) {
+                navigateToProfileActivity();
+                return true;
+            } else if (id == R.id.nav_logout) {
+                logoutUser();
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void navigateToMainActivity() {
+        Intent intent = new Intent(NoticeActivity.this, MainActivity.class);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
+        finish();
+    }
+
+    private void navigateToTaskActivity() {
+        Intent intent = new Intent(NoticeActivity.this, TaskActivity.class);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
+        finish();
+    }
+
+    private void navigateToProfileActivity() {
+        Intent intent = new Intent(NoticeActivity.this, ProfileActivity.class);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
+        finish();
+    }
+
+    private void logoutUser() {
+        // Call logout API
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<Void> call = apiService.logout(sessionManager.getToken());
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                // Clear session regardless of API response
+                sessionManager.clear();
+                showToast("Logged out successfully");
+                redirectToLogin();
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                // Still clear local session even if API call fails
+                sessionManager.clear();
+                showToast("Logged out");
+                redirectToLogin();
+            }
+        });
     }
 
     private void setupRecyclerView() {
@@ -81,12 +164,7 @@ public class NoticeActivity extends AppCompatActivity {
     }
 
     private void loadNotices() {
-        // Hide error and show loading
-        textViewError.setVisibility(View.GONE);
-
-        if (!swipeRefreshLayout.isRefreshing()) {
-            progressBar.setVisibility(View.VISIBLE);
-        }
+        showLoading(true);
 
         String token = sessionManager.getToken();
         if (token == null) {
@@ -95,12 +173,12 @@ public class NoticeActivity extends AppCompatActivity {
         }
 
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<NoticesResponse> call = apiService.getNotices(token);
+        Call<NoticesResponse> call = apiService.getNotices("Bearer " + token);
 
         call.enqueue(new Callback<NoticesResponse>() {
             @Override
             public void onResponse(Call<NoticesResponse> call, Response<NoticesResponse> response) {
-                progressBar.setVisibility(View.GONE);
+                showLoading(false);
                 swipeRefreshLayout.setRefreshing(false);
 
                 if (response.isSuccessful() && response.body() != null) {
@@ -117,7 +195,7 @@ public class NoticeActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<NoticesResponse> call, Throwable t) {
-                progressBar.setVisibility(View.GONE);
+                showLoading(false);
                 swipeRefreshLayout.setRefreshing(false);
                 showError("Network error: " + t.getMessage());
             }
@@ -125,22 +203,54 @@ public class NoticeActivity extends AppCompatActivity {
     }
 
     private void showNotices(List<Notice> notices) {
-        recyclerViewNotices.setVisibility(View.VISIBLE);
-        textViewError.setVisibility(View.GONE);
-        noticeAdapter.updateNotices(notices);
+        if (recyclerViewNotices != null) {
+            recyclerViewNotices.setVisibility(View.VISIBLE);
+        }
+        if (tvError != null) {
+            tvError.setVisibility(View.GONE);
+        }
+        if (noticeAdapter != null) {
+            noticeAdapter.updateNotices(notices);
+        }
+    }
+
+    private void showLoading(boolean show) {
+        if (progressBar != null) {
+            progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
+        if (show) {
+            if (tvError != null) {
+                tvError.setVisibility(View.GONE);
+            }
+            if (recyclerViewNotices != null) {
+                recyclerViewNotices.setVisibility(View.GONE);
+            }
+        }
     }
 
     private void showError(String message) {
-        recyclerViewNotices.setVisibility(View.GONE);
-        textViewError.setVisibility(View.VISIBLE);
-        textViewError.setText(message);
+        if (tvError != null) {
+            tvError.setText(message);
+            tvError.setVisibility(View.VISIBLE);
+        }
+        if (recyclerViewNotices != null) {
+            recyclerViewNotices.setVisibility(View.GONE);
+        }
+        if (progressBar != null) {
+            progressBar.setVisibility(View.GONE);
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         // Refresh notices when activity resumes
-        if (noticeAdapter.getItemCount() == 0) {
+        if (noticeAdapter == null || noticeAdapter.getItemCount() == 0) {
             loadNotices();
         }
     }

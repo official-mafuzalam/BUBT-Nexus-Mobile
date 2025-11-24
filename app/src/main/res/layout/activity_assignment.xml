@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/primary_color"
-    tools:context=".TaskActivity">
+    tools:context=".AssignmentActivity">
 
     <!-- Header Section -->
     <LinearLayout
@@ -38,7 +38,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Tasks"
+                android:text="Assignments"
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 android:textStyle="bold"
@@ -63,7 +63,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Manage your assignments and deadlines"
+                android:text="View and submit your assignments"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 android:alpha="0.8"
@@ -108,7 +108,7 @@
                     android:id="@+id/tvError"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Failed to load tasks"
+                    android:text="Failed to load assignments"
                     android:textSize="16sp"
                     android:textColor="@color/red"
                     android:gravity="center"
@@ -137,7 +137,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Task management feature will be available soon"
+                        android:text="Assignment management feature will be available soon"
                         android:textSize="16sp"
                         android:textColor="@color/gray"
                         android:gravity="center"
