@@ -16,10 +16,31 @@
         android:theme="@style/Theme.BUBTNexus"
         tools:targetApi="31">
         <activity
-            android:name=".AssignmentActivity"
+            android:name=".RideRequestActivity"
             android:exported="false" />
         <activity
-            android:name=".utils.AssignmentActivity"
+            android:name=".RideMapActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RideChatActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MyRideActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RideDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FindRideActivity"
+            android:exported="false" />
+        <activity
+            android:name=".utils.FindRideActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateRideActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AssignmentActivity"
             android:exported="false" />
         <activity
             android:name=".EditProfileActivity"
@@ -35,7 +56,7 @@
             android:exported="false" />
         <activity
             android:name=".NoticeActivity"
-            android:exported="false" /> <!-- Login Activity (Launcher) -->
+            android:exported="false" />
         <activity
             android:name=".LoginActivity"
             android:exported="true">
