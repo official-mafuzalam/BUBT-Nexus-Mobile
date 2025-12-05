@@ -1,23 +1,11 @@
 package com.octosync.bubtnexus.network;
 
-import com.octosync.bubtnexus.models.LoginRequest;
-import com.octosync.bubtnexus.models.LoginResponse;
-import com.octosync.bubtnexus.models.NoticesResponse;
-import com.octosync.bubtnexus.models.ProfileUpdateRequest;
-import com.octosync.bubtnexus.models.ProfileUpdateResponse;
-import com.octosync.bubtnexus.models.RegisterRequest;
-import com.octosync.bubtnexus.models.RoutineResponse;
-import com.octosync.bubtnexus.models.UserResponse;
-
+import com.octosync.bubtnexus.models.*;
 import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.POST;
-import retrofit2.http.PUT;
-import retrofit2.http.Query;
+import retrofit2.http.*;
 
 public interface ApiService {
+    // Existing methods
     @POST("login")
     Call<LoginResponse> login(@Body LoginRequest loginRequest);
 
@@ -41,10 +29,46 @@ public interface ApiService {
             @Query("intake") String intake
     );
 
-    // Profile update without image
     @PUT("profile")
     Call<ProfileUpdateResponse> updateProfile(
             @Header("Authorization") String token,
             @Body ProfileUpdateRequest profileUpdateRequest
+    );
+
+    @GET("/api/rides/nearby")
+    Call<NearbyRidesResponse> getNearbyRides(
+            @Header("Authorization") String token,
+            @Query("latitude") double latitude,
+            @Query("longitude") double longitude,
+            @Query("radius") Integer radius,
+            @Query("max_seats") Integer maxSeats,
+            @Query("max_fare") Double maxFare
+    );
+
+    @GET("/api/rides/{rideId}")
+    Call<RideDetailsResponse> getRideDetails(
+            @Header("Authorization") String token,
+            @Path("rideId") int rideId
+    );
+
+    @POST("/api/rides/{rideId}/request")
+    Call<RideRequestResponse> requestRide(
+            @Header("Authorization") String token,
+            @Path("rideId") int rideId,
+            @Body RideRequest rideRequest
+    );
+
+    @POST("/api/rides/create")
+    Call<RideCreateResponse> createRide(
+            @Header("Authorization") String token,
+            @Body RideCreateRequest rideCreateRequest
+    );
+
+    @PUT("/api/rides/{rideId}/request/{requestId}")
+    Call<PassengerRequestResponse> updateRequestStatus(
+            @Header("Authorization") String token,
+            @Path("rideId") int rideId,
+            @Path("requestId") int requestId,
+            @Body UpdatePassengerRequestActionRequest request
     );
 }
