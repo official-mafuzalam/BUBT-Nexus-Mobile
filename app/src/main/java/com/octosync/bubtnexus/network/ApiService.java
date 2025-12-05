@@ -35,15 +35,8 @@ public interface ApiService {
             @Body ProfileUpdateRequest profileUpdateRequest
     );
 
-    // New Ride APIs
-    @POST("rides/create")
-    Call<RideResponse> createRide(
-            @Header("Authorization") String token,
-            @Body CreateRideRequest rideRequest
-    );
-
-    @GET("rides/nearby")
-    Call<RidesResponse> getNearbyRides(
+    @GET("/api/rides/nearby")
+    Call<NearbyRidesResponse> getNearbyRides(
             @Header("Authorization") String token,
             @Query("latitude") double latitude,
             @Query("longitude") double longitude,
@@ -52,76 +45,16 @@ public interface ApiService {
             @Query("max_fare") Double maxFare
     );
 
-    @GET("rides/{id}")
-    Call<RideResponse> getRideDetails(
+    @GET("/api/rides/{rideId}")
+    Call<RideDetailsResponse> getRideDetails(
             @Header("Authorization") String token,
-            @Path("id") int rideId
+            @Path("rideId") int rideId
     );
 
-    @POST("rides/{id}/request")
-    Call<ApiResponse> requestRide(
-            @Header("Authorization") String token,
-            @Path("id") int rideId,
-            @Body RideRequestRequest request
-    );
-
-    @PUT("rides/{rideId}/request/{requestId}")
-    Call<ApiResponse> handleRideRequest(
+    @POST("/api/rides/{rideId}/request")
+    Call<RideRequestResponse> requestRide(
             @Header("Authorization") String token,
             @Path("rideId") int rideId,
-            @Path("requestId") int requestId,
-            @Body ActionRequest action
-    );
-
-    @PUT("rides/{id}/status")
-    Call<RideResponse> updateRideStatus(
-            @Header("Authorization") String token,
-            @Path("id") int rideId,
-            @Body StatusUpdateRequest status
-    );
-
-    @POST("rides/{id}/location")
-    Call<ApiResponse> updateLocation(
-            @Header("Authorization") String token,
-            @Path("id") int rideId,
-            @Body LocationUpdateRequest location
-    );
-
-    @GET("rides/{id}/locations")
-    Call<ApiResponse> getRideLocations(
-            @Header("Authorization") String token,
-            @Path("id") int rideId
-    );
-
-    @POST("rides/{id}/message")
-    Call<ApiResponse> sendMessage(
-            @Header("Authorization") String token,
-            @Path("id") int rideId,
-            @Body MessageRequest message
-    );
-
-    @GET("rides/{id}/messages")
-    Call<ApiResponse> getRideMessages(
-            @Header("Authorization") String token,
-            @Path("id") int rideId,
-            @Query("page") Integer page
-    );
-
-    @GET("rides/my-rides")
-    Call<MyRidesResponse> getMyRides(
-            @Header("Authorization") String token
-    );
-
-    // Device registration for push notifications
-    @POST("device/register")
-    Call<ApiResponse> registerDevice(
-            @Header("Authorization") String token,
-            @Body DeviceRegistrationRequest deviceRequest
-    );
-
-    @DELETE("device/unregister/{token}")
-    Call<ApiResponse> unregisterDevice(
-            @Header("Authorization") String authToken,
-            @Path("token") String deviceToken
+            @Body RideRequest rideRequest
     );
 }

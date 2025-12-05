@@ -93,8 +93,8 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.btnCommunity).setOnClickListener(v -> openSection("Community"));
         findViewById(R.id.btnEvents).setOnClickListener(v -> openSection("Events"));
-        findViewById(R.id.btnProfile).setOnClickListener(v -> {
-            navigateToProfileActivity();
+        findViewById(R.id.btnRide).setOnClickListener(v -> {
+            navigateToRideSharingActivity();
         });
         etSearch.setOnClickListener(v -> showToast("Search opened"));
     }
@@ -130,6 +130,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void navigateToProfileActivity() {
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
+    }
+
+    private void navigateToRideSharingActivity() {
+        Intent intent = new Intent(MainActivity.this, RideSharingActivity.class);
         startActivity(intent);
         overridePendingTransition(0, 0);
     }

@@ -3,26 +3,35 @@ package com.octosync.bubtnexus;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.octosync.bubtnexus.adapters.PassengersAdapter;
-import com.octosync.bubtnexus.models.Passenger;
+import com.google.android.material.card.MaterialCardView; // Make sure this import is correct
+import com.google.android.material.textfield.TextInputEditText;
 import com.octosync.bubtnexus.models.Ride;
-import com.octosync.bubtnexus.models.RideResponse;
+import com.octosync.bubtnexus.models.RideDetailsResponse;
+import com.octosync.bubtnexus.models.RideRequest;
+import com.octosync.bubtnexus.models.RideRequestResponse;
 import com.octosync.bubtnexus.network.ApiClient;
 import com.octosync.bubtnexus.network.ApiService;
-import com.octosync.bubtnexus.utils.DateTimeUtils;
-import com.octosync.bubtnexus.utils.SharedPrefManager;
+import com.octosync.bubtnexus.utils.SessionManager;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,202 +39,395 @@ import retrofit2.Response;
 
 public class RideDetailsActivity extends AppCompatActivity {
 
+    // UI Components
+    private TextView tvTitle, tvRideId, tvDriverName, tvDriverStatus, tvFromLocation, tvToLocation;
+    private TextView tvDepartureTime, tvAvailableSeats, tvFare, tvVehicleType, tvVehicleNumber;
+    private TextView tvDistance, tvStatus, tvNotes, tvAlreadyRequested, tvRequestSent;
+    private ProgressBar progressBar;
+    private TextView tvError;
+    private LinearLayout llContent;
+    private ImageButton btnBack;
+    private MaterialCardView cardNotes;
+    private Spinner spinnerSeats;
+    private TextInputEditText etMessage;
+    private Button btnRequestRide;
+
+    // Session and Data
+    private SessionManager sessionManager;
     private int rideId;
     private Ride ride;
-    private boolean isDriver = false;
-
-    private TextView tvFromLocation, tvToLocation, tvDriverName, tvDepartureTime;
-    private TextView tvAvailableSeats, tvFare, tvNotes, tvVehicleInfo;
-    private RecyclerView recyclerViewPassengers;
-    private Button btnChat, btnMap, btnManage;
-    private ImageButton btnBack;
-    private ProgressBar progressBar;
-
-    private SharedPrefManager sharedPrefManager;
-    private PassengersAdapter passengersAdapter;
+    private int selectedSeats = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ride_details);
+
+        sessionManager = new SessionManager(this);
+
+        // Check if user is logged in
+        if (!isUserLoggedIn()) {
+            redirectToLogin();
+            return;
+        }
 
         // Get ride ID from intent
-        rideId = getIntent().getIntExtra("ride_id", 0);
-        if (rideId == 0) {
-            Toast.makeText(this, "Invalid ride", Toast.LENGTH_SHORT).show();
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("ride_id")) {
+            rideId = intent.getIntExtra("ride_id", 0);
+        } else {
+            showToast("Invalid ride selection");
             finish();
             return;
         }
 
-        sharedPrefManager = SharedPrefManager.getInstance(this);
-
+        setContentView(R.layout.activity_ride_details);
         initializeViews();
         setupClickListeners();
         loadRideDetails();
     }
 
+    private boolean isUserLoggedIn() {
+        return sessionManager.getToken() != null;
+    }
+
+    private void redirectToLogin() {
+        Intent intent = new Intent(RideDetailsActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
     private void initializeViews() {
+        // TextViews
+        tvTitle = findViewById(R.id.tvTitle);
+        tvRideId = findViewById(R.id.tvRideId);
+        tvDriverName = findViewById(R.id.tvDriverName);
+        tvDriverStatus = findViewById(R.id.tvDriverStatus);
         tvFromLocation = findViewById(R.id.tvFromLocation);
         tvToLocation = findViewById(R.id.tvToLocation);
-        tvDriverName = findViewById(R.id.tvDriverName);
         tvDepartureTime = findViewById(R.id.tvDepartureTime);
         tvAvailableSeats = findViewById(R.id.tvAvailableSeats);
         tvFare = findViewById(R.id.tvFare);
+        tvVehicleType = findViewById(R.id.tvVehicleType);
+        tvVehicleNumber = findViewById(R.id.tvVehicleNumber);
+        tvDistance = findViewById(R.id.tvDistance);
+        tvStatus = findViewById(R.id.tvStatus);
         tvNotes = findViewById(R.id.tvNotes);
-        tvVehicleInfo = findViewById(R.id.tvVehicleInfo);
-        recyclerViewPassengers = findViewById(R.id.recyclerViewPassengers);
-        btnChat = findViewById(R.id.btnChat);
-        btnMap = findViewById(R.id.btnMap);
-        btnManage = findViewById(R.id.btnManage);
-        btnBack = findViewById(R.id.btnBack);
-        progressBar = findViewById(R.id.progressBar);
+        tvAlreadyRequested = findViewById(R.id.tvAlreadyRequested);
+        tvRequestSent = findViewById(R.id.tvRequestSent);
 
-        // Setup passengers recycler view
-        passengersAdapter = new PassengersAdapter(this, null);
-        recyclerViewPassengers.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewPassengers.setAdapter(passengersAdapter);
+        // Other views
+        progressBar = findViewById(R.id.progressBar);
+        tvError = findViewById(R.id.tvError);
+        llContent = findViewById(R.id.llContent);
+        btnBack = findViewById(R.id.btnBack);
+        cardNotes = findViewById(R.id.cardNotes);
+        spinnerSeats = findViewById(R.id.spinnerSeats);
+        etMessage = findViewById(R.id.etMessage);
+        btnRequestRide = findViewById(R.id.btnRequestRide);
+
+        // Set ride ID in header
+        tvRideId.setText(String.format("Ride #%d", rideId));
     }
 
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
 
-        btnChat.setOnClickListener(v -> {
-            Intent intent = new Intent(this, RideChatActivity.class);
-            intent.putExtra("ride_id", rideId);
-            startActivity(intent);
+        btnRequestRide.setOnClickListener(v -> {
+            if (ride != null) {
+                requestToJoinRide();
+            }
         });
 
-        btnMap.setOnClickListener(v -> {
-            Intent intent = new Intent(this, RideMapActivity.class);
-            intent.putExtra("ride_id", rideId);
-            intent.putExtra("from_lat", ride.getFromLat());
-            intent.putExtra("from_lng", ride.getFromLng());
-            intent.putExtra("to_lat", ride.getToLat());
-            intent.putExtra("to_lng", ride.getToLng());
-            startActivity(intent);
-        });
+        // Setup spinner listener
+        spinnerSeats.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0) {
+                    selectedSeats = position; // 1-based index
+                }
+            }
 
-        btnManage.setOnClickListener(v -> {
-            if (isDriver) {
-                // Driver can manage requests
-                Intent intent = new Intent(this, RideRequestsActivity.class);
-                intent.putExtra("ride_id", rideId);
-                startActivity(intent);
-            } else {
-                // Passenger can view their request status
-                Toast.makeText(this, "You are a passenger on this ride", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                selectedSeats = 1;
             }
         });
     }
 
     private void loadRideDetails() {
-        String token = sharedPrefManager.getToken();
+        showLoading(true);
+
+        String token = sessionManager.getToken();
         if (token == null) {
+            showError("Please login again");
             redirectToLogin();
             return;
         }
 
-        progressBar.setVisibility(View.VISIBLE);
-
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<RideResponse> call = apiService.getRideDetails("Bearer " + token, rideId);
+        Call<RideDetailsResponse> call = apiService.getRideDetails(
+                "Bearer " + token,
+                rideId
+        );
 
-        call.enqueue(new Callback<RideResponse>() {
+        call.enqueue(new Callback<RideDetailsResponse>() {
             @Override
-            public void onResponse(Call<RideResponse> call, Response<RideResponse> response) {
-                progressBar.setVisibility(View.GONE);
+            public void onResponse(Call<RideDetailsResponse> call, Response<RideDetailsResponse> response) {
+                showLoading(false);
 
                 if (response.isSuccessful() && response.body() != null) {
-                    ride = response.body().getData();
-                    updateUI();
+                    ride = response.body().getRide();
+                    if (ride != null) {
+                        showRideDetails();
+                    } else {
+                        showError("Failed to load ride details");
+                    }
                 } else {
-                    Toast.makeText(RideDetailsActivity.this,
-                            "Failed to load ride details", Toast.LENGTH_SHORT).show();
-                    finish();
+                    if (response.code() == 404) {
+                        showError("Ride not found");
+                    } else {
+                        showError("Failed to load ride details. Code: " + response.code());
+                    }
                 }
             }
 
             @Override
-            public void onFailure(Call<RideResponse> call, Throwable t) {
-                progressBar.setVisibility(View.GONE);
-                Toast.makeText(RideDetailsActivity.this,
-                        "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                finish();
+            public void onFailure(Call<RideDetailsResponse> call, Throwable t) {
+                showLoading(false);
+                showError("Network error: " + t.getMessage());
             }
         });
     }
 
-    private void updateUI() {
-        if (ride == null) return;
+    private void showRideDetails() {
+        llContent.setVisibility(View.VISIBLE);
+        tvError.setVisibility(View.GONE);
 
-        // Check if current user is the driver
-        int currentUserId = sharedPrefManager.getUserId();
-        isDriver = (ride.getDriverId() == currentUserId);
+        // Set ride details
+        tvTitle.setText(String.format("Ride to %s", ride.getToLocation()));
 
-        // Update views
+        // Driver info
+        if (ride.getDriver() != null) {
+            tvDriverName.setText(ride.getDriver().getName());
+            tvDriverStatus.setText(ride.getDriver().getStatus());
+            // Set status color
+            if ("active".equalsIgnoreCase(ride.getDriver().getStatus())) {
+                tvDriverStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+            } else {
+                tvDriverStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            }
+        }
+
+        // Route
         tvFromLocation.setText(ride.getFromLocation());
         tvToLocation.setText(ride.getToLocation());
-        tvDriverName.setText(ride.getDriverName());
-        tvDepartureTime.setText(DateTimeUtils.formatDateTime(ride.getDepartureTime()));
-        tvAvailableSeats.setText(String.format("Available: %d/%d",
-                ride.getAvailableSeats(), ride.getTotalSeats()));
-        tvFare.setText(String.format("৳%.2f per seat", ride.getFarePerSeat()));
 
+        // Format departure time
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault());
+            Date date = inputFormat.parse(ride.getDepartureTime());
+            tvDepartureTime.setText(outputFormat.format(date));
+        } catch (ParseException e) {
+            tvDepartureTime.setText(ride.getDepartureTime());
+        }
+
+        // Ride info
+        tvAvailableSeats.setText(String.format(Locale.getDefault(), "%d seats", ride.getAvailableSeats()));
+        tvFare.setText(String.format("৳%s", ride.getFarePerSeat()));
+
+        if (ride.getVehicleType() != null) {
+            tvVehicleType.setText(ride.getVehicleType());
+        }
+
+        if (ride.getVehicleNumber() != null) {
+            tvVehicleNumber.setText(ride.getVehicleNumber());
+        }
+
+        tvDistance.setText(String.format(Locale.getDefault(), "%.1f km", ride.getDistance()));
+        tvStatus.setText(ride.getStatus());
+
+        // Set status color
+        if ("active".equalsIgnoreCase(ride.getStatus())) {
+            tvStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+        } else {
+            tvStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            btnRequestRide.setEnabled(false);
+            btnRequestRide.setText("Ride Not Available");
+            btnRequestRide.setAlpha(0.5f);
+        }
+
+        // Notes
         if (ride.getNotes() != null && !ride.getNotes().isEmpty()) {
             tvNotes.setText(ride.getNotes());
-            tvNotes.setVisibility(View.VISIBLE);
-        } else {
-            tvNotes.setVisibility(View.GONE);
+            cardNotes.setVisibility(View.VISIBLE);
         }
 
-        // Vehicle info
-        String vehicleInfo = "";
-        if (ride.getVehicleType() != null && !ride.getVehicleType().isEmpty()) {
-            vehicleInfo += ride.getVehicleType();
-        }
-        if (ride.getVehicleNumber() != null && !ride.getVehicleNumber().isEmpty()) {
-            vehicleInfo += " • " + ride.getVehicleNumber();
-        }
-        if (!vehicleInfo.isEmpty()) {
-            tvVehicleInfo.setText(vehicleInfo);
-            tvVehicleInfo.setVisibility(View.VISIBLE);
-        } else {
-            tvVehicleInfo.setVisibility(View.GONE);
+        // Setup seats spinner
+        setupSeatsSpinner();
+    }
+
+    private void setupSeatsSpinner() {
+        int availableSeats = ride.getAvailableSeats();
+
+        List<String> seatsOptions = new ArrayList<>();
+        seatsOptions.add("Select seats");
+
+        for (int i = 1; i <= availableSeats; i++) {
+            seatsOptions.add(String.valueOf(i));
         }
 
-        // Update passengers list
-        List<Passenger> passengers = ride.getConfirmedPassengers();
-        if (passengers != null && !passengers.isEmpty()) {
-            passengersAdapter.updateData(passengers);
-            recyclerViewPassengers.setVisibility(View.VISIBLE);
-        } else {
-            recyclerViewPassengers.setVisibility(View.GONE);
+        if (availableSeats == 0) {
+            seatsOptions.add("No seats available");
+            spinnerSeats.setEnabled(false);
+            btnRequestRide.setEnabled(false);
+            btnRequestRide.setText("No Seats Available");
+            btnRequestRide.setAlpha(0.5f);
         }
 
-        // Update button text based on user role
-        if (isDriver) {
-            btnManage.setText("Manage Requests");
-            btnManage.setVisibility(View.VISIBLE);
-        } else {
-            btnManage.setText("My Request");
-            // Check if user is a passenger
-            boolean isPassenger = false;
-            if (passengers != null) {
-                for (Passenger passenger : passengers) {
-                    if (passenger.getPassengerId() == currentUserId) {
-                        isPassenger = true;
-                        break;
-                    }
-                }
-            }
-            btnManage.setVisibility(isPassenger ? View.VISIBLE : View.GONE);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                seatsOptions
+        );
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSeats.setAdapter(adapter);
+
+        // Set default selection to 1 seat if available
+        if (availableSeats >= 1) {
+            spinnerSeats.setSelection(1); // Index 1 is "1"
         }
     }
 
-    private void redirectToLogin() {
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
+    private void requestToJoinRide() {
+        // Get selected seats from spinner
+        String selectedSeatStr = (String) spinnerSeats.getSelectedItem();
+
+        if (selectedSeatStr == null || selectedSeatStr.equals("Select seats") || selectedSeatStr.equals("No seats available")) {
+            showToast("Please select number of seats");
+            return;
+        }
+
+        int requestedSeats;
+        try {
+            requestedSeats = Integer.parseInt(selectedSeatStr);
+        } catch (NumberFormatException e) {
+            showToast("Invalid seat selection");
+            return;
+        }
+
+        // Get message
+        String message = etMessage.getText() != null ? etMessage.getText().toString().trim() : "";
+
+        // Validate seats
+        if (requestedSeats > ride.getAvailableSeats()) {
+            showToast("Not enough seats available");
+            return;
+        }
+
+        // Show confirmation dialog
+        new AlertDialog.Builder(this)
+                .setTitle("Confirm Request")
+                .setMessage(String.format("Request %d seat(s) for this ride?", requestedSeats))
+                .setPositiveButton("Send Request", (dialog, which) -> {
+                    sendRideRequest(requestedSeats, message);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void sendRideRequest(int requestedSeats, String message) {
+        btnRequestRide.setEnabled(false);
+        btnRequestRide.setText("Sending...");
+
+        String token = sessionManager.getToken();
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+
+        RideRequest rideRequest = new RideRequest(requestedSeats, message);
+        Call<RideRequestResponse> call = apiService.requestRide(
+                "Bearer " + token,
+                rideId,
+                rideRequest
+        );
+
+        call.enqueue(new Callback<RideRequestResponse>() {
+            @Override
+            public void onResponse(Call<RideRequestResponse> call, Response<RideRequestResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // Request successful
+                    tvRequestSent.setVisibility(View.VISIBLE);
+                    btnRequestRide.setVisibility(View.GONE);
+                    etMessage.setEnabled(false);
+                    spinnerSeats.setEnabled(false);
+
+                    showToast(response.body().getMessage());
+
+                    // Refresh ride details to update available seats
+                    loadRideDetails();
+
+                } else if (response.code() == 400) {
+                    // Duplicate request
+                    tvAlreadyRequested.setVisibility(View.VISIBLE);
+                    btnRequestRide.setVisibility(View.GONE);
+                    showToast("You have already requested this ride");
+                } else {
+                    // Get error body to see what's wrong
+                    String errorMessage = "Failed to send request. Please try again.";
+                    try {
+                        if (response.errorBody() != null) {
+                            String errorBody = response.errorBody().string();
+                            // Parse error response
+                            showToast("Error: " + response.code() + " - " + errorBody);
+                            // You can parse the JSON if it's structured
+                        } else {
+                            showToast("Error: " + response.code() + " - No error body");
+                        }
+                    } catch (Exception e) {
+                        showToast("Error: " + response.code() + " - " + e.getMessage());
+                    }
+
+                    btnRequestRide.setEnabled(true);
+                    btnRequestRide.setText("Send Request");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RideRequestResponse> call, Throwable t) {
+                showToast("Network error: " + t.getMessage());
+                btnRequestRide.setEnabled(true);
+                btnRequestRide.setText("Send Request");
+            }
+        });
+    }
+
+    private void showLoading(boolean show) {
+        progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+        if (show) {
+            tvError.setVisibility(View.GONE);
+            llContent.setVisibility(View.GONE);
+        }
+    }
+
+    private void showError(String message) {
+        tvError.setText(message);
+        tvError.setVisibility(View.VISIBLE);
+        llContent.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
+        showToast(message);
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh ride details if needed
+        if (ride == null) {
+            loadRideDetails();
+        }
     }
 }

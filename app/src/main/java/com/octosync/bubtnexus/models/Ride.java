@@ -1,17 +1,14 @@
 package com.octosync.bubtnexus.models;
 
 import com.google.gson.annotations.SerializedName;
-import java.util.Date;
 import java.util.List;
 
 public class Ride {
+    @SerializedName("id")
     private int id;
 
     @SerializedName("driver_id")
     private int driverId;
-
-    @SerializedName("driver_name")
-    private String driverName;
 
     @SerializedName("from_location")
     private String fromLocation;
@@ -20,16 +17,16 @@ public class Ride {
     private String toLocation;
 
     @SerializedName("from_lat")
-    private double fromLat;
+    private String fromLat;
 
     @SerializedName("from_lng")
-    private double fromLng;
+    private String fromLng;
 
     @SerializedName("to_lat")
-    private double toLat;
+    private String toLat;
 
     @SerializedName("to_lng")
-    private double toLng;
+    private String toLng;
 
     @SerializedName("available_seats")
     private int availableSeats;
@@ -38,15 +35,27 @@ public class Ride {
     private int totalSeats;
 
     @SerializedName("fare_per_seat")
-    private double farePerSeat;
+    private String farePerSeat;
 
+    @SerializedName("status")
     private String status;
 
     @SerializedName("departure_time")
     private String departureTime;
 
+    @SerializedName("notes")
     private String notes;
 
+    @SerializedName("distance")
+    private double distance;
+
+    @SerializedName("driver")
+    private User driver;
+
+    @SerializedName("confirmed_passengers")
+    private List<Object> confirmedPassengers; // Changed back to List<Object>
+
+    // Add these fields to your existing Ride.java
     @SerializedName("vehicle_type")
     private String vehicleType;
 
@@ -56,21 +65,18 @@ public class Ride {
     @SerializedName("created_at")
     private String createdAt;
 
-    @SerializedName("confirmed_passengers")
-    private List<Passenger> confirmedPassengers;
+    @SerializedName("updated_at")
+    private String updatedAt;
 
-    private User driver;
-    private double distance;
+    @SerializedName("requests")
+    private List<Object> requests; // You might want to create a Request model
 
-    // Getters and setters
+    // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
     public int getDriverId() { return driverId; }
     public void setDriverId(int driverId) { this.driverId = driverId; }
-
-    public String getDriverName() { return driverName; }
-    public void setDriverName(String driverName) { this.driverName = driverName; }
 
     public String getFromLocation() { return fromLocation; }
     public void setFromLocation(String fromLocation) { this.fromLocation = fromLocation; }
@@ -78,17 +84,17 @@ public class Ride {
     public String getToLocation() { return toLocation; }
     public void setToLocation(String toLocation) { this.toLocation = toLocation; }
 
-    public double getFromLat() { return fromLat; }
-    public void setFromLat(double fromLat) { this.fromLat = fromLat; }
+    public String getFromLat() { return fromLat; }
+    public void setFromLat(String fromLat) { this.fromLat = fromLat; }
 
-    public double getFromLng() { return fromLng; }
-    public void setFromLng(double fromLng) { this.fromLng = fromLng; }
+    public String getFromLng() { return fromLng; }
+    public void setFromLng(String fromLng) { this.fromLng = fromLng; }
 
-    public double getToLat() { return toLat; }
-    public void setToLat(double toLat) { this.toLat = toLat; }
+    public String getToLat() { return toLat; }
+    public void setToLat(String toLat) { this.toLat = toLat; }
 
-    public double getToLng() { return toLng; }
-    public void setToLng(double toLng) { this.toLng = toLng; }
+    public String getToLng() { return toLng; }
+    public void setToLng(String toLng) { this.toLng = toLng; }
 
     public int getAvailableSeats() { return availableSeats; }
     public void setAvailableSeats(int availableSeats) { this.availableSeats = availableSeats; }
@@ -96,8 +102,8 @@ public class Ride {
     public int getTotalSeats() { return totalSeats; }
     public void setTotalSeats(int totalSeats) { this.totalSeats = totalSeats; }
 
-    public double getFarePerSeat() { return farePerSeat; }
-    public void setFarePerSeat(double farePerSeat) { this.farePerSeat = farePerSeat; }
+    public String getFarePerSeat() { return farePerSeat; }
+    public void setFarePerSeat(String farePerSeat) { this.farePerSeat = farePerSeat; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
@@ -108,6 +114,15 @@ public class Ride {
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
 
+    public double getDistance() { return distance; }
+    public void setDistance(double distance) { this.distance = distance; }
+
+    public User getDriver() { return driver; }
+    public void setDriver(User driver) { this.driver = driver; }
+
+    public List<Object> getConfirmedPassengers() { return confirmedPassengers; }
+    public void setConfirmedPassengers(List<Object> confirmedPassengers) { this.confirmedPassengers = confirmedPassengers; }
+
     public String getVehicleType() { return vehicleType; }
     public void setVehicleType(String vehicleType) { this.vehicleType = vehicleType; }
 
@@ -117,12 +132,19 @@ public class Ride {
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
 
-    public List<Passenger> getConfirmedPassengers() { return confirmedPassengers; }
-    public void setConfirmedPassengers(List<Passenger> confirmedPassengers) { this.confirmedPassengers = confirmedPassengers; }
+    public String getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(String updatedAt) { this.updatedAt = updatedAt; }
 
-    public User getDriver() { return driver; }
-    public void setDriver(User driver) { this.driver = driver; }
+    public List<Object> getRequests() { return requests; }
+    public void setRequests(List<Object> requests) { this.requests = requests; }
 
-    public double getDistance() { return distance; }
-    public void setDistance(double distance) { this.distance = distance; }
+    // Helper method to get confirmed passengers count
+    public int getConfirmedPassengersCount() {
+        return confirmedPassengers != null ? confirmedPassengers.size() : 0;
+    }
+
+    // Helper method to calculate booked seats
+    public int getBookedSeats() {
+        return totalSeats - availableSeats;
+    }
 }
