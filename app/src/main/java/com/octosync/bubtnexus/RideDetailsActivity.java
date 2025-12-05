@@ -2,26 +2,24 @@ package com.octosync.bubtnexus;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.card.MaterialCardView; // Make sure this import is correct
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.card.MaterialCardView;
+import com.octosync.bubtnexus.models.PassengerRequest;
+import com.octosync.bubtnexus.models.PassengerRequestResponse;
 import com.octosync.bubtnexus.models.Ride;
 import com.octosync.bubtnexus.models.RideDetailsResponse;
-import com.octosync.bubtnexus.models.RideRequest;
-import com.octosync.bubtnexus.models.RideRequestResponse;
+import com.octosync.bubtnexus.models.UpdatePassengerRequestActionRequest;
 import com.octosync.bubtnexus.network.ApiClient;
 import com.octosync.bubtnexus.network.ApiService;
 import com.octosync.bubtnexus.utils.SessionManager;
@@ -42,27 +40,30 @@ public class RideDetailsActivity extends AppCompatActivity {
     // UI Components
     private TextView tvTitle, tvRideId, tvDriverName, tvDriverStatus, tvFromLocation, tvToLocation;
     private TextView tvDepartureTime, tvAvailableSeats, tvFare, tvVehicleType, tvVehicleNumber;
-    private TextView tvDistance, tvStatus, tvNotes, tvAlreadyRequested, tvRequestSent;
+    private TextView tvDistance, tvStatus, tvNotes;
     private ProgressBar progressBar;
     private TextView tvError;
     private LinearLayout llContent;
     private ImageButton btnBack;
     private MaterialCardView cardNotes;
-    private Spinner spinnerSeats;
-    private TextInputEditText etMessage;
-    private Button btnRequestRide;
+    private MaterialCardView cardPassengerRequests;
+
+    // Passenger requests views
+    private LinearLayout llRequestsContainer;
+    private TextView tvNoRequests;
 
     // Session and Data
     private SessionManager sessionManager;
     private int rideId;
     private Ride ride;
-    private int selectedSeats = 1;
+    private int currentUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         sessionManager = new SessionManager(this);
+        currentUserId = sessionManager.getUserId();
 
         // Check if user is logged in
         if (!isUserLoggedIn()) {
@@ -113,8 +114,6 @@ public class RideDetailsActivity extends AppCompatActivity {
         tvDistance = findViewById(R.id.tvDistance);
         tvStatus = findViewById(R.id.tvStatus);
         tvNotes = findViewById(R.id.tvNotes);
-        tvAlreadyRequested = findViewById(R.id.tvAlreadyRequested);
-        tvRequestSent = findViewById(R.id.tvRequestSent);
 
         // Other views
         progressBar = findViewById(R.id.progressBar);
@@ -122,9 +121,11 @@ public class RideDetailsActivity extends AppCompatActivity {
         llContent = findViewById(R.id.llContent);
         btnBack = findViewById(R.id.btnBack);
         cardNotes = findViewById(R.id.cardNotes);
-        spinnerSeats = findViewById(R.id.spinnerSeats);
-        etMessage = findViewById(R.id.etMessage);
-        btnRequestRide = findViewById(R.id.btnRequestRide);
+        cardPassengerRequests = findViewById(R.id.cardPassengerRequests);
+
+        // Passenger requests views
+        llRequestsContainer = findViewById(R.id.llRequestsContainer);
+        tvNoRequests = findViewById(R.id.tvNoRequests);
 
         // Set ride ID in header
         tvRideId.setText(String.format("Ride #%d", rideId));
@@ -132,27 +133,6 @@ public class RideDetailsActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
-
-        btnRequestRide.setOnClickListener(v -> {
-            if (ride != null) {
-                requestToJoinRide();
-            }
-        });
-
-        // Setup spinner listener
-        spinnerSeats.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0) {
-                    selectedSeats = position; // 1-based index
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                selectedSeats = 1;
-            }
-        });
     }
 
     private void loadRideDetails() {
@@ -180,6 +160,7 @@ public class RideDetailsActivity extends AppCompatActivity {
                     ride = response.body().getRide();
                     if (ride != null) {
                         showRideDetails();
+                        setupPassengerRequests();
                     } else {
                         showError("Failed to load ride details");
                     }
@@ -253,9 +234,6 @@ public class RideDetailsActivity extends AppCompatActivity {
             tvStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
         } else {
             tvStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            btnRequestRide.setEnabled(false);
-            btnRequestRide.setText("Ride Not Available");
-            btnRequestRide.setAlpha(0.5f);
         }
 
         // Notes
@@ -263,141 +241,239 @@ public class RideDetailsActivity extends AppCompatActivity {
             tvNotes.setText(ride.getNotes());
             cardNotes.setVisibility(View.VISIBLE);
         }
-
-        // Setup seats spinner
-        setupSeatsSpinner();
     }
 
-    private void setupSeatsSpinner() {
-        int availableSeats = ride.getAvailableSeats();
-
-        List<String> seatsOptions = new ArrayList<>();
-        seatsOptions.add("Select seats");
-
-        for (int i = 1; i <= availableSeats; i++) {
-            seatsOptions.add(String.valueOf(i));
-        }
-
-        if (availableSeats == 0) {
-            seatsOptions.add("No seats available");
-            spinnerSeats.setEnabled(false);
-            btnRequestRide.setEnabled(false);
-            btnRequestRide.setText("No Seats Available");
-            btnRequestRide.setAlpha(0.5f);
-        }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_item,
-                seatsOptions
-        );
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerSeats.setAdapter(adapter);
-
-        // Set default selection to 1 seat if available
-        if (availableSeats >= 1) {
-            spinnerSeats.setSelection(1); // Index 1 is "1"
-        }
-    }
-
-    private void requestToJoinRide() {
-        // Get selected seats from spinner
-        String selectedSeatStr = (String) spinnerSeats.getSelectedItem();
-
-        if (selectedSeatStr == null || selectedSeatStr.equals("Select seats") || selectedSeatStr.equals("No seats available")) {
-            showToast("Please select number of seats");
+    private void setupPassengerRequests() {
+        // Show passenger requests section only for the ride creator
+        if (ride.getDriverId() != currentUserId) {
+            cardPassengerRequests.setVisibility(View.GONE);
             return;
         }
 
-        int requestedSeats;
+        if (ride.getRequests() == null || ride.getRequests().isEmpty()) {
+            tvNoRequests.setText("No passenger requests");
+            tvNoRequests.setVisibility(View.VISIBLE);
+            llRequestsContainer.setVisibility(View.GONE);
+            cardPassengerRequests.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        cardPassengerRequests.setVisibility(View.VISIBLE);
+        llRequestsContainer.removeAllViews();
+
+        // Separate pending and processed requests
+        List<PassengerRequest> pendingRequests = new ArrayList<>();
+        List<PassengerRequest> processedRequests = new ArrayList<>();
+
+        for (PassengerRequest request : ride.getRequests()) {
+            if ("pending".equalsIgnoreCase(request.getStatus())) {
+                pendingRequests.add(request);
+            } else {
+                processedRequests.add(request);
+            }
+        }
+
+        // Show all requests
+        if (pendingRequests.isEmpty() && processedRequests.isEmpty()) {
+            tvNoRequests.setVisibility(View.VISIBLE);
+            llRequestsContainer.setVisibility(View.GONE);
+        } else {
+            tvNoRequests.setVisibility(View.GONE);
+            llRequestsContainer.setVisibility(View.VISIBLE);
+
+            // Add pending requests first
+            if (!pendingRequests.isEmpty()) {
+                for (PassengerRequest request : pendingRequests) {
+                    View requestView = createRequestView(request, true);
+                    llRequestsContainer.addView(requestView);
+                }
+            }
+
+            // Add processed requests
+            if (!processedRequests.isEmpty()) {
+                for (PassengerRequest request : processedRequests) {
+                    View requestView = createRequestView(request, false);
+                    llRequestsContainer.addView(requestView);
+                }
+            }
+        }
+    }
+
+    private View createRequestView(PassengerRequest request, boolean isPending) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.item_passenger_request, llRequestsContainer, false);
+
+        TextView tvPassengerName = view.findViewById(R.id.tvPassengerName);
+        TextView tvRequestSeats = view.findViewById(R.id.tvRequestSeats);
+        TextView tvRequestStatus = view.findViewById(R.id.tvRequestStatus);
+        TextView tvRequestMessage = view.findViewById(R.id.tvRequestMessage);
+        TextView tvRequestDate = view.findViewById(R.id.tvRequestDate);
+        LinearLayout llActionButtons = view.findViewById(R.id.llActionButtons);
+        com.google.android.material.button.MaterialButton btnAccept = view.findViewById(R.id.btnAccept);
+        com.google.android.material.button.MaterialButton btnReject = view.findViewById(R.id.btnReject);
+
+        // Set passenger info
+        if (request.getPassenger() != null) {
+            tvPassengerName.setText(request.getPassenger().getName());
+        } else {
+            tvPassengerName.setText("Unknown Passenger");
+        }
+
+        tvRequestSeats.setText(String.format(Locale.getDefault(), "%d seat%s requested",
+                request.getRequestedSeats(),
+                request.getRequestedSeats() > 1 ? "s" : ""));
+
+        // Set status
+        String statusText = request.getStatus().toUpperCase();
+        tvRequestStatus.setText(statusText);
+
+        // Set status background and color based on status
+        int statusColor;
+        int statusBackground;
+        switch (request.getStatus().toLowerCase()) {
+            case "accepted":
+                statusColor = android.R.color.holo_green_dark;
+                statusBackground = R.drawable.bg_status_accepted;
+                tvRequestStatus.setTextColor(getResources().getColor(statusColor));
+                tvRequestStatus.setBackgroundResource(statusBackground);
+                llActionButtons.setVisibility(View.GONE);
+                break;
+            case "rejected":
+                statusColor = android.R.color.holo_red_dark;
+                statusBackground = R.drawable.bg_status_rejected;
+                tvRequestStatus.setTextColor(getResources().getColor(statusColor));
+                tvRequestStatus.setBackgroundResource(statusBackground);
+                llActionButtons.setVisibility(View.GONE);
+                break;
+            default: // pending
+                statusColor = android.R.color.holo_orange_dark;
+                statusBackground = R.drawable.bg_status_pending;
+                tvRequestStatus.setTextColor(getResources().getColor(statusColor));
+                tvRequestStatus.setBackgroundResource(statusBackground);
+                if (isPending) {
+                    llActionButtons.setVisibility(View.VISIBLE);
+                } else {
+                    llActionButtons.setVisibility(View.GONE);
+                }
+        }
+
+        // Set message
+        if (!TextUtils.isEmpty(request.getMessage())) {
+            tvRequestMessage.setText(request.getMessage());
+            tvRequestMessage.setVisibility(View.VISIBLE);
+        } else {
+            tvRequestMessage.setVisibility(View.GONE);
+        }
+
+        // Set request date
         try {
-            requestedSeats = Integer.parseInt(selectedSeatStr);
-        } catch (NumberFormatException e) {
-            showToast("Invalid seat selection");
-            return;
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());
+            SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault());
+            Date date = inputFormat.parse(request.getCreatedAt());
+            tvRequestDate.setText("Requested: " + outputFormat.format(date));
+        } catch (ParseException e) {
+            tvRequestDate.setText("Requested: " + request.getCreatedAt());
         }
 
-        // Get message
-        String message = etMessage.getText() != null ? etMessage.getText().toString().trim() : "";
+        // Setup accept button (only for pending requests)
+        if (isPending) {
+            btnAccept.setOnClickListener(v -> {
+                showConfirmDialog("Accept Request",
+                        String.format("Accept %s's request for %d seat%s?",
+                                request.getPassenger() != null ? request.getPassenger().getName() : "this passenger",
+                                request.getRequestedSeats(),
+                                request.getRequestedSeats() > 1 ? "s" : ""),
+                        "accept", request.getId());
+            });
 
-        // Validate seats
-        if (requestedSeats > ride.getAvailableSeats()) {
-            showToast("Not enough seats available");
-            return;
+            // Setup reject button (only for pending requests)
+            btnReject.setOnClickListener(v -> {
+                showConfirmDialog("Reject Request",
+                        String.format("Reject %s's request for %d seat%s?",
+                                request.getPassenger() != null ? request.getPassenger().getName() : "this passenger",
+                                request.getRequestedSeats(),
+                                request.getRequestedSeats() > 1 ? "s" : ""),
+                        "reject", request.getId());
+            });
+        } else {
+            llActionButtons.setVisibility(View.GONE);
         }
 
-        // Show confirmation dialog
+        return view;
+    }
+
+    private void showConfirmDialog(String title, String message, final String action, final int requestId) {
         new AlertDialog.Builder(this)
-                .setTitle("Confirm Request")
-                .setMessage(String.format("Request %d seat(s) for this ride?", requestedSeats))
-                .setPositiveButton("Send Request", (dialog, which) -> {
-                    sendRideRequest(requestedSeats, message);
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Confirm", (dialog, which) -> {
+                    updateRequestStatus(requestId, action);
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
 
-    private void sendRideRequest(int requestedSeats, String message) {
-        btnRequestRide.setEnabled(false);
-        btnRequestRide.setText("Sending...");
+    private void updateRequestStatus(int requestId, String action) {
+        showLoading(true);
 
         String token = sessionManager.getToken();
+        if (token == null) {
+            showToast("Please login again");
+            redirectToLogin();
+            return;
+        }
+
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
 
-        RideRequest rideRequest = new RideRequest(requestedSeats, message);
-        Call<RideRequestResponse> call = apiService.requestRide(
+        // Create the request with your class name
+        UpdatePassengerRequestActionRequest updateRequest = new UpdatePassengerRequestActionRequest(action);
+        Call<PassengerRequestResponse> call = apiService.updateRequestStatus(
                 "Bearer " + token,
                 rideId,
-                rideRequest
+                requestId,
+                updateRequest
         );
 
-        call.enqueue(new Callback<RideRequestResponse>() {
+        call.enqueue(new Callback<PassengerRequestResponse>() {
             @Override
-            public void onResponse(Call<RideRequestResponse> call, Response<RideRequestResponse> response) {
+            public void onResponse(Call<PassengerRequestResponse> call,
+                                   Response<PassengerRequestResponse> response) {
+                showLoading(false);
+
                 if (response.isSuccessful() && response.body() != null) {
-                    // Request successful
-                    tvRequestSent.setVisibility(View.VISIBLE);
-                    btnRequestRide.setVisibility(View.GONE);
-                    etMessage.setEnabled(false);
-                    spinnerSeats.setEnabled(false);
-
                     showToast(response.body().getMessage());
-
-                    // Refresh ride details to update available seats
+                    // Refresh ride details
                     loadRideDetails();
-
-                } else if (response.code() == 400) {
-                    // Duplicate request
-                    tvAlreadyRequested.setVisibility(View.VISIBLE);
-                    btnRequestRide.setVisibility(View.GONE);
-                    showToast("You have already requested this ride");
                 } else {
-                    // Get error body to see what's wrong
-                    String errorMessage = "Failed to send request. Please try again.";
+                    // Handle different error cases
+                    if (response.code() == 404) {
+                        showToast("Request not found. It may have been already processed.");
+                    } else if (response.code() == 403) {
+                        showToast("You don't have permission to update this request.");
+                    } else if (response.code() == 400) {
+                        showToast("Invalid action. Please try again.");
+                    } else {
+                        showToast("Failed to update request status. Code: " + response.code());
+                    }
+
+                    // Try to get error message from response body
                     try {
                         if (response.errorBody() != null) {
                             String errorBody = response.errorBody().string();
-                            // Parse error response
-                            showToast("Error: " + response.code() + " - " + errorBody);
-                            // You can parse the JSON if it's structured
-                        } else {
-                            showToast("Error: " + response.code() + " - No error body");
+                            // Log the error for debugging
+                            System.out.println("Error response: " + errorBody);
                         }
                     } catch (Exception e) {
-                        showToast("Error: " + response.code() + " - " + e.getMessage());
+                        e.printStackTrace();
                     }
-
-                    btnRequestRide.setEnabled(true);
-                    btnRequestRide.setText("Send Request");
                 }
             }
 
             @Override
-            public void onFailure(Call<RideRequestResponse> call, Throwable t) {
+            public void onFailure(Call<PassengerRequestResponse> call, Throwable t) {
+                showLoading(false);
                 showToast("Network error: " + t.getMessage());
-                btnRequestRide.setEnabled(true);
-                btnRequestRide.setText("Send Request");
+                t.printStackTrace();
             }
         });
     }

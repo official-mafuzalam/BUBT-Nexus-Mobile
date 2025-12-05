@@ -57,4 +57,18 @@ public interface ApiService {
             @Path("rideId") int rideId,
             @Body RideRequest rideRequest
     );
+
+    @POST("/api/rides/create")
+    Call<RideCreateResponse> createRide(
+            @Header("Authorization") String token,
+            @Body RideCreateRequest rideCreateRequest
+    );
+
+    @PUT("/api/rides/{rideId}/request/{requestId}")
+    Call<PassengerRequestResponse> updateRequestStatus(
+            @Header("Authorization") String token,
+            @Path("rideId") int rideId,
+            @Path("requestId") int requestId,
+            @Body UpdatePassengerRequestActionRequest request
+    );
 }

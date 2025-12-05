@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/primary_color"
-    tools:context=".RideDetailsActivity">
+    android:orientation="vertical"
+    tools:context=".BookRideActivity">
+
 
     <!-- Header Section -->
     <LinearLayout
@@ -20,11 +21,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/btnBack"
@@ -38,14 +39,14 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
                 android:text="Ride Details"
                 android:textColor="@color/white"
                 android:textSize="24sp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"
-                android:gravity="center"
-                android:layout_marginStart="16dp"/>
+                android:textStyle="bold" />
 
             <View
                 android:layout_width="40dp"
@@ -57,19 +58,19 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp">
+            android:layout_marginEnd="24dp"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/tvRideId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:alpha="0.8"
+                android:fontFamily="sans-serif"
                 android:text="Ride #1"
                 android:textColor="@color/white"
-                android:textSize="14sp"
-                android:alpha="0.8"
-                android:fontFamily="sans-serif"/>
+                android:textSize="14sp" />
 
         </LinearLayout>
 
@@ -79,11 +80,11 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="16dp"
         android:layout_weight="1"
-        app:cardCornerRadius="32dp"
         app:cardBackgroundColor="@color/white"
-        app:cardElevation="8dp"
-        android:layout_marginTop="16dp">
+        app:cardCornerRadius="32dp"
+        app:cardElevation="8dp">
 
         <!-- ScrollView for details -->
         <androidx.core.widget.NestedScrollView
@@ -111,11 +112,11 @@
                     android:id="@+id/tvError"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Failed to load ride details"
-                    android:textSize="16sp"
-                    android:textColor="@color/red"
                     android:gravity="center"
                     android:padding="16dp"
+                    android:text="Failed to load ride details"
+                    android:textColor="@color/red"
+                    android:textSize="16sp"
                     android:visibility="gone" />
 
                 <!-- Ride Details Content -->
@@ -130,9 +131,9 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
                         app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp"
-                        android:layout_marginBottom="16dp">
+                        app:cardElevation="2dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -143,24 +144,24 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginBottom="12dp"
                                 android:text="Driver Information"
-                                android:textSize="16sp"
-                                android:textStyle="bold"
                                 android:textColor="?android:attr/textColorPrimary"
-                                android:layout_marginBottom="12dp"/>
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical">
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
 
                                 <ImageView
                                     android:layout_width="50dp"
                                     android:layout_height="50dp"
+                                    android:layout_marginEnd="12dp"
                                     android:src="@drawable/ic_person"
-                                    app:tint="?attr/colorPrimary"
-                                    android:layout_marginEnd="12dp"/>
+                                    app:tint="?attr/colorPrimary" />
 
                                 <LinearLayout
                                     android:layout_width="0dp"
@@ -173,18 +174,18 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Admin"
+                                        android:textColor="?android:attr/textColorPrimary"
                                         android:textSize="18sp"
-                                        android:textStyle="bold"
-                                        android:textColor="?android:attr/textColorPrimary"/>
+                                        android:textStyle="bold" />
 
                                     <TextView
                                         android:id="@+id/tvDriverStatus"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
                                         android:text="Active"
-                                        android:textSize="14sp"
                                         android:textColor="@color/green"
-                                        android:layout_marginTop="2dp"/>
+                                        android:textSize="14sp" />
 
                                 </LinearLayout>
 
@@ -198,9 +199,9 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
                         app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp"
-                        android:layout_marginBottom="16dp">
+                        app:cardElevation="2dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -211,24 +212,24 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginBottom="12dp"
                                 android:text="Route Details"
-                                android:textSize="16sp"
-                                android:textStyle="bold"
                                 android:textColor="?android:attr/textColorPrimary"
-                                android:layout_marginBottom="12dp"/>
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
 
                             <!-- From Location -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:layout_marginBottom="12dp">
+                                android:layout_marginBottom="12dp"
+                                android:orientation="horizontal">
 
                                 <ImageView
                                     android:layout_width="20dp"
                                     android:layout_height="20dp"
-                                    android:src="@drawable/ic_location"
                                     android:layout_marginEnd="12dp"
+                                    android:src="@drawable/ic_location"
                                     app:tint="@android:color/holo_green_dark" />
 
                                 <LinearLayout
@@ -241,17 +242,17 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="From"
-                                        android:textSize="12sp"
-                                        android:textColor="?android:attr/textColorSecondary"/>
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="12sp" />
 
                                     <TextView
                                         android:id="@+id/tvFromLocation"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
                                         android:text="BUBT, Dhaka"
-                                        android:textSize="14sp"
                                         android:textColor="?android:attr/textColorPrimary"
-                                        android:layout_marginTop="2dp"/>
+                                        android:textSize="14sp" />
 
                                 </LinearLayout>
 
@@ -266,8 +267,8 @@
                                 <ImageView
                                     android:layout_width="20dp"
                                     android:layout_height="20dp"
-                                    android:src="@drawable/ic_location"
                                     android:layout_marginEnd="12dp"
+                                    android:src="@drawable/ic_location"
                                     app:tint="@android:color/holo_red_dark" />
 
                                 <LinearLayout
@@ -280,17 +281,17 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="To"
-                                        android:textSize="12sp"
-                                        android:textColor="?android:attr/textColorSecondary"/>
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="12sp" />
 
                                     <TextView
                                         android:id="@+id/tvToLocation"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
                                         android:text="Farmgate, Dhaka"
-                                        android:textSize="14sp"
                                         android:textColor="?android:attr/textColorPrimary"
-                                        android:layout_marginTop="2dp"/>
+                                        android:textSize="14sp" />
 
                                 </LinearLayout>
 
@@ -304,9 +305,9 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
                         app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp"
-                        android:layout_marginBottom="16dp">
+                        app:cardElevation="2dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -317,35 +318,35 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginBottom="12dp"
                                 android:text="Ride Information"
-                                android:textSize="16sp"
-                                android:textStyle="bold"
                                 android:textColor="?android:attr/textColorPrimary"
-                                android:layout_marginBottom="12dp"/>
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
 
                             <!-- Departure Time -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:layout_marginBottom="8dp">
+                                android:layout_marginBottom="8dp"
+                                android:orientation="horizontal">
 
                                 <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
                                     android:text="Departure Time"
-                                    android:textSize="14sp"
-                                    android:textColor="?android:attr/textColorSecondary"/>
+                                    android:textColor="?android:attr/textColorSecondary"
+                                    android:textSize="14sp" />
 
                                 <TextView
                                     android:id="@+id/tvDepartureTime"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="2025-12-25 14:30"
-                                    android:textSize="14sp"
                                     android:textColor="?android:attr/textColorPrimary"
-                                    android:textStyle="bold"/>
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
 
                             </LinearLayout>
 
@@ -353,25 +354,25 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:layout_marginBottom="8dp">
+                                android:layout_marginBottom="8dp"
+                                android:orientation="horizontal">
 
                                 <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
                                     android:text="Available Seats"
-                                    android:textSize="14sp"
-                                    android:textColor="?android:attr/textColorSecondary"/>
+                                    android:textColor="?android:attr/textColorSecondary"
+                                    android:textSize="14sp" />
 
                                 <TextView
                                     android:id="@+id/tvAvailableSeats"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="4 seats"
-                                    android:textSize="14sp"
                                     android:textColor="?android:attr/textColorPrimary"
-                                    android:textStyle="bold"/>
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
 
                             </LinearLayout>
 
@@ -379,25 +380,25 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:layout_marginBottom="8dp">
+                                android:layout_marginBottom="8dp"
+                                android:orientation="horizontal">
 
                                 <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
                                     android:text="Fare per Seat"
-                                    android:textSize="14sp"
-                                    android:textColor="?android:attr/textColorSecondary"/>
+                                    android:textColor="?android:attr/textColorSecondary"
+                                    android:textSize="14sp" />
 
                                 <TextView
                                     android:id="@+id/tvFare"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="৳50.00"
-                                    android:textSize="14sp"
                                     android:textColor="?android:attr/textColorPrimary"
-                                    android:textStyle="bold"/>
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
 
                             </LinearLayout>
 
@@ -405,40 +406,40 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:layout_marginBottom="8dp">
+                                android:layout_marginBottom="8dp"
+                                android:orientation="horizontal">
 
                                 <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
                                     android:text="Vehicle"
-                                    android:textSize="14sp"
-                                    android:textColor="?android:attr/textColorSecondary"/>
+                                    android:textColor="?android:attr/textColorSecondary"
+                                    android:textSize="14sp" />
 
                                 <LinearLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:orientation="vertical"
-                                    android:gravity="end">
+                                    android:gravity="end"
+                                    android:orientation="vertical">
 
                                     <TextView
                                         android:id="@+id/tvVehicleType"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Car"
-                                        android:textSize="14sp"
                                         android:textColor="?android:attr/textColorPrimary"
-                                        android:textStyle="bold"/>
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
 
                                     <TextView
                                         android:id="@+id/tvVehicleNumber"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
                                         android:text="DHA-12345"
-                                        android:textSize="12sp"
                                         android:textColor="?android:attr/textColorSecondary"
-                                        android:layout_marginTop="2dp"/>
+                                        android:textSize="12sp" />
 
                                 </LinearLayout>
 
@@ -448,25 +449,25 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:layout_marginBottom="8dp">
+                                android:layout_marginBottom="8dp"
+                                android:orientation="horizontal">
 
                                 <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
                                     android:text="Distance"
-                                    android:textSize="14sp"
-                                    android:textColor="?android:attr/textColorSecondary"/>
+                                    android:textColor="?android:attr/textColorSecondary"
+                                    android:textSize="14sp" />
 
                                 <TextView
                                     android:id="@+id/tvDistance"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="14.78 km"
-                                    android:textSize="14sp"
                                     android:textColor="?android:attr/textColorPrimary"
-                                    android:textStyle="bold"/>
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
 
                             </LinearLayout>
 
@@ -481,17 +482,17 @@
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
                                     android:text="Status"
-                                    android:textSize="14sp"
-                                    android:textColor="?android:attr/textColorSecondary"/>
+                                    android:textColor="?android:attr/textColorSecondary"
+                                    android:textSize="14sp" />
 
                                 <TextView
                                     android:id="@+id/tvStatus"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Active"
-                                    android:textSize="14sp"
                                     android:textColor="@color/green"
-                                    android:textStyle="bold"/>
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
 
                             </LinearLayout>
 
@@ -504,10 +505,10 @@
                         android:id="@+id/cardNotes"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp"
                         android:layout_marginBottom="16dp"
-                        android:visibility="gone">
+                        android:visibility="gone"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="2dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -518,34 +519,31 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginBottom="8dp"
                                 android:text="Notes"
-                                android:textSize="16sp"
-                                android:textStyle="bold"
                                 android:textColor="?android:attr/textColorPrimary"
-                                android:layout_marginBottom="8dp"/>
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
 
                             <TextView
                                 android:id="@+id/tvNotes"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:lineSpacingExtra="4dp"
                                 android:text="Going via Mirpur road"
-                                android:textSize="14sp"
                                 android:textColor="?android:attr/textColorSecondary"
-                                android:lineSpacingExtra="4dp"/>
+                                android:textSize="14sp" />
 
                         </LinearLayout>
 
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Passenger Requests Card -->
+                    <!-- Request Ride Card -->
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardPassengerRequests"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp"
-                        android:layout_marginBottom="16dp"
-                        android:visibility="gone">
+                        app:cardElevation="2dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -556,29 +554,97 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Passenger Requests"
-                                android:textSize="16sp"
-                                android:textStyle="bold"
+                                android:layout_marginBottom="16dp"
+                                android:text="Request to Join"
                                 android:textColor="?android:attr/textColorPrimary"
-                                android:layout_marginBottom="12dp"/>
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
 
-                            <TextView
-                                android:id="@+id/tvNoRequests"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="No pending requests"
-                                android:textSize="14sp"
-                                android:textColor="?android:attr/textColorSecondary"
-                                android:gravity="center"
-                                android:padding="16dp"/>
-
-                            <!-- Requests will be added dynamically -->
+                            <!-- Seats Selection -->
                             <LinearLayout
-                                android:id="@+id/llRequestsContainer"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:visibility="gone"/>
+                                android:layout_marginBottom="12dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Seats needed"
+                                    android:textColor="?android:attr/textColorSecondary"
+                                    android:textSize="14sp" />
+
+                                <Spinner
+                                    android:id="@+id/spinnerSeats"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:minWidth="100dp" />
+
+                            </LinearLayout>
+
+                            <!-- Message Input -->
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8dp"
+                                android:text="Message to Driver (Optional)"
+                                android:textColor="?android:attr/textColorSecondary"
+                                android:textSize="14sp" />
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="16dp">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/etMessage"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="Enter your message"
+                                    android:inputType="textMultiLine"
+                                    android:lines="3"
+                                    android:maxLines="3"
+                                    android:minLines="3" />
+
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                            <!-- Request Button -->
+                            <Button
+                                android:id="@+id/btnRequestRide"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Send Request"
+                                android:textAllCaps="false"
+                                android:textColor="@android:color/white"
+                                android:textStyle="bold"
+                                app:backgroundTint="?attr/colorPrimary" />
+
+                            <!-- Already Requested Message -->
+                            <TextView
+                                android:id="@+id/tvAlreadyRequested"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:padding="8dp"
+                                android:text="You have already requested this ride"
+                                android:textColor="@color/green"
+                                android:textSize="14sp"
+                                android:visibility="gone" />
+
+                            <!-- Request Sent Message -->
+                            <TextView
+                                android:id="@+id/tvRequestSent"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:padding="8dp"
+                                android:text="Request sent successfully!"
+                                android:textColor="@color/green"
+                                android:textSize="14sp"
+                                android:visibility="gone" />
 
                         </LinearLayout>
 
@@ -587,7 +653,7 @@
                     <!-- Spacer at bottom -->
                     <View
                         android:layout_width="match_parent"
-                        android:layout_height="24dp"/>
+                        android:layout_height="24dp" />
 
                 </LinearLayout>
 

@@ -18,6 +18,12 @@
         android:theme="@style/Theme.BUBTNexus"
         tools:targetApi="31">
         <activity
+            android:name=".BookRideActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RideCreateActivity"
+            android:exported="false" />
+        <activity
             android:name=".RideDetailsActivity"
             android:exported="false" />
         <activity

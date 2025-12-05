@@ -69,7 +69,7 @@ public class Ride {
     private String updatedAt;
 
     @SerializedName("requests")
-    private List<Object> requests; // You might want to create a Request model
+    private List<PassengerRequest> requests;
 
     // Getters and Setters
     public int getId() { return id; }
@@ -135,8 +135,8 @@ public class Ride {
     public String getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(String updatedAt) { this.updatedAt = updatedAt; }
 
-    public List<Object> getRequests() { return requests; }
-    public void setRequests(List<Object> requests) { this.requests = requests; }
+    public List<PassengerRequest> getRequests() { return requests; }
+    public void setRequests(List<PassengerRequest> requests) { this.requests = requests; }
 
     // Helper method to get confirmed passengers count
     public int getConfirmedPassengersCount() {

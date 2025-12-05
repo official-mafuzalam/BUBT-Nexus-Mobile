@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.octosync.bubtnexus.adapters.RideAdapter;
 import com.octosync.bubtnexus.models.NearbyRidesResponse;
 import com.octosync.bubtnexus.models.Ride;
@@ -32,14 +31,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RideSharingActivity extends AppCompatActivity {
+public class RideSharingActivity extends AppCompatActivity implements RideAdapter.OnRideClickListener {
 
     // UI Components
     private RecyclerView recyclerViewRides;
     private ProgressBar progressBar;
     private TextView tvError, tvLocation;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private ImageButton btnBack, btnFilter;
+    private ImageButton btnBack, btnCreate;
     private LinearLayout llEmpty;
 
     // Adapter and Session
@@ -103,27 +102,47 @@ public class RideSharingActivity extends AppCompatActivity {
         recyclerViewRides = findViewById(R.id.recyclerViewRides);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         btnBack = findViewById(R.id.btnBack);
-        btnFilter = findViewById(R.id.btnFilter);
+        btnCreate = findViewById(R.id.btnCreate);
         llEmpty = findViewById(R.id.llEmpty);
     }
 
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
 
-        btnFilter.setOnClickListener(v -> {
-            // TODO: Implement filter dialog
-            Toast.makeText(this, "Filter functionality coming soon", Toast.LENGTH_SHORT).show();
+        btnCreate.setOnClickListener(v -> {
+            Intent intent = new Intent(RideSharingActivity.this, RideCreateActivity.class);
+            startActivityForResult(intent, 1);
         });
     }
+
     private void setupRecyclerView() {
-        rideAdapter = new RideAdapter(null, ride -> {
-            // Open ride details activity
-            Intent intent = new Intent(RideSharingActivity.this, RideDetailsActivity.class);
-            intent.putExtra("ride_id", ride.getId());
-            startActivity(intent);
-        });
+        rideAdapter = new RideAdapter(null, this, this);
         recyclerViewRides.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewRides.setAdapter(rideAdapter);
+    }
+
+    @Override
+    public void onRideClick(Ride ride) {
+        // Open ride details when item is clicked
+        Intent intent = new Intent(RideSharingActivity.this, RideDetailsActivity.class);
+        intent.putExtra("ride_id", ride.getId());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onActionButtonClick(Ride ride, boolean isMyRide) {
+        if (isMyRide) {
+            // If it's my ride, open ride details/management
+            Intent intent = new Intent(RideSharingActivity.this, RideDetailsActivity.class);
+            intent.putExtra("ride_id", ride.getId());
+            intent.putExtra("is_my_ride", true);
+            startActivity(intent);
+        } else {
+            // If it's not my ride, open booking activity
+            Intent intent = new Intent(RideSharingActivity.this, BookRideActivity.class);
+            intent.putExtra("ride_id", ride.getId());
+            startActivity(intent);
+        }
     }
 
     private void requestLocationPermission() {
@@ -263,6 +282,15 @@ public class RideSharingActivity extends AppCompatActivity {
 
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            // Refresh rides when returning from create activity
+            loadNearbyRides();
+        }
     }
 
     @Override
