@@ -97,15 +97,35 @@
                         android:textStyle="bold"
                         android:layout_marginBottom="4dp" />
 
-                    <EditText
-                        android:id="@+id/etFromLocation"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Enter starting point"
-                        android:inputType="text"
-                        android:maxLines="1"
-                        android:padding="12dp"
-                        android:background="@drawable/edittext_background" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <EditText
+                            android:id="@+id/etFromLocation"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="Tap to select location"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:padding="12dp"
+                            android:background="@drawable/edittext_background"
+                            android:focusable="false"
+                            android:clickable="true" />
+
+                        <ImageButton
+                            android:id="@+id/btnFromMap"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="8dp"
+                            android:src="@drawable/ic_location"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            app:tint="@color/primary_color" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -125,15 +145,35 @@
                         android:textStyle="bold"
                         android:layout_marginBottom="4dp" />
 
-                    <EditText
-                        android:id="@+id/etToLocation"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Enter destination"
-                        android:inputType="text"
-                        android:maxLines="1"
-                        android:padding="12dp"
-                        android:background="@drawable/edittext_background" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <EditText
+                            android:id="@+id/etToLocation"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="Tap to select location"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:padding="12dp"
+                            android:background="@drawable/edittext_background"
+                            android:focusable="false"
+                            android:clickable="true" />
+
+                        <ImageButton
+                            android:id="@+id/btnToMap"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="8dp"
+                            android:src="@drawable/ic_location"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            app:tint="@color/primary_color" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 

@@ -44,7 +44,7 @@ public class RideCreateActivity extends AppCompatActivity {
     private EditText etVehicleType, etVehicleNumber, etNotes;
     private EditText etFromLat, etFromLng, etToLat, etToLng;
     private Button btnDepartureTime, btnUseCurrentLocation, btnPickOnMap;
-    private ImageButton btnBack, btnSave;
+    private ImageButton btnBack, btnSave, btnFromMap, btnToMap; // Added btnFromMap and btnToMap
     private TextView tvDepartureTime, tvError;
     private ProgressBar progressBar;
 
@@ -56,6 +56,7 @@ public class RideCreateActivity extends AppCompatActivity {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 101;
     private double currentLatitude = 0;
     private double currentLongitude = 0;
+    private static final int REQUEST_MAP_PICKER = 102;
 
     // Date and Time
     private Calendar departureCalendar = Calendar.getInstance();
@@ -118,7 +119,9 @@ public class RideCreateActivity extends AppCompatActivity {
         btnUseCurrentLocation = findViewById(R.id.btnUseCurrentLocation);
         btnPickOnMap = findViewById(R.id.btnPickOnMap);
         btnBack = findViewById(R.id.btnBack);
-        btnSave = findViewById(R.id.btnSave);  // This is ImageButton, not Button
+        btnSave = findViewById(R.id.btnSave);
+        btnFromMap = findViewById(R.id.btnFromMap); // New
+        btnToMap = findViewById(R.id.btnToMap);     // New
 
         // TextViews
         tvDepartureTime = findViewById(R.id.tvDepartureTime);
@@ -144,10 +147,44 @@ public class RideCreateActivity extends AppCompatActivity {
             }
         });
 
-        btnPickOnMap.setOnClickListener(v -> {
-            // TODO: Implement map picker
-            Toast.makeText(this, "Map picker coming soon", Toast.LENGTH_SHORT).show();
-        });
+        // Remove old btnPickOnMap listener
+        // btnPickOnMap.setOnClickListener(v -> {
+        //     // Open map picker for "from" location
+        //     Intent intent = new Intent(RideCreateActivity.this, MapPickerActivity.class);
+        //     intent.putExtra("location_type", "from");
+        //     startActivityForResult(intent, REQUEST_MAP_PICKER);
+        // });
+
+        // Set BUBT as default "To" location
+        setDefaultBUBTLocation();
+
+        // Add click listeners for location selection
+        etFromLocation.setOnClickListener(v -> openMapPicker("from"));
+        btnFromMap.setOnClickListener(v -> openMapPicker("from"));
+
+        etToLocation.setOnClickListener(v -> openMapPicker("to"));
+        btnToMap.setOnClickListener(v -> openMapPicker("to"));
+    }
+
+    private void setDefaultBUBTLocation() {
+        // Set BUBT as default "To" location
+        etToLocation.setText("BUBT, Dhaka");
+        etToLat.setText("23.810331");
+        etToLng.setText("90.412521");
+    }
+
+    private void openMapPicker(String locationType) {
+        Intent intent = new Intent(RideCreateActivity.this, MapPickerActivity.class);
+        intent.putExtra("location_type", locationType);
+        startActivityForResult(intent, REQUEST_MAP_PICKER);
+    }
+
+    private void openMapPickerForFrom() {
+        openMapPicker("from");
+    }
+
+    private void openMapPickerForTo() {
+        openMapPicker("to");
     }
 
     private void setDefaultValues() {
@@ -411,5 +448,30 @@ public class RideCreateActivity extends AppCompatActivity {
         tvError.setText(message);
         tvError.setVisibility(View.VISIBLE);
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    // Add this method to handle map picker result
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_MAP_PICKER && resultCode == RESULT_OK && data != null) {
+            double latitude = data.getDoubleExtra("latitude", 0);
+            double longitude = data.getDoubleExtra("longitude", 0);
+            String address = data.getStringExtra("address");
+            String locationType = data.getStringExtra("location_type");
+
+            if (latitude != 0 && longitude != 0) {
+                if ("from".equals(locationType)) {
+                    etFromLocation.setText(address);
+                    etFromLat.setText(String.valueOf(latitude));
+                    etFromLng.setText(String.valueOf(longitude));
+                } else if ("to".equals(locationType)) {
+                    etToLocation.setText(address);
+                    etToLat.setText(String.valueOf(latitude));
+                    etToLng.setText(String.valueOf(longitude));
+                }
+            }
+        }
     }
 }
