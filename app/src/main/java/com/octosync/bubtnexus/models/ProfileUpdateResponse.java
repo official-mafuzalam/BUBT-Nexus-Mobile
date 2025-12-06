@@ -10,23 +10,43 @@ public class ProfileUpdateResponse {
     private String message;
 
     @SerializedName("data")
-    private UserData data;
+    private Data data;
 
     // Getters and Setters
-    public boolean isSuccess() { return success; }
-    public void setSuccess(boolean success) { this.success = success; }
+    public boolean isSuccess() {
+        return success;
+    }
 
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
 
-    public UserData getData() { return data; }
-    public void setData(UserData data) { this.data = data; }
+    public String getMessage() {
+        return message;
+    }
 
-    public static class UserData {
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public Data getData() {
+        return data;
+    }
+
+    public void setData(Data data) {
+        this.data = data;
+    }
+
+    public static class Data {
         @SerializedName("user")
-        private LoginResponse.User user;
+        private User user;
 
-        public LoginResponse.User getUser() { return user; }
-        public void setUser(LoginResponse.User user) { this.user = user; }
+        public User getUser() {
+            return user;
+        }
+
+        public void setUser(User user) {
+            this.user = user;
+        }
     }
 }

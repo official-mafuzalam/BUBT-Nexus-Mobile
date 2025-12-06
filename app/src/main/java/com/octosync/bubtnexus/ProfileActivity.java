@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,7 +27,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigation;
     private SessionManager sessionManager;
-    private TextView tvUserName, tvStudentId, tvDepartment, tvEmail, tvPhone, tvSemester, tvBatch, tvDate;
+    private TextView tvUserName, tvStudentId, tvDepartment, tvEmail, tvPhone, tvSemester, tvBatch, tvDate, tvDesignation;
     private MaterialButton btnEditProfile, btnSettings;
     private ImageButton btnBack;
     private ImageView ivProfile;
@@ -65,8 +66,9 @@ public class ProfileActivity extends AppCompatActivity {
         tvSemester = findViewById(R.id.tvSemester);
         tvBatch = findViewById(R.id.tvBatch);
         tvDate = findViewById(R.id.tvDate);
+        tvDesignation = findViewById(R.id.tvDesignation); // Add this if exists
 
-        //ImageVies
+        // ImageView
         ivProfile = findViewById(R.id.ivProfile);
 
         // Buttons
@@ -83,22 +85,15 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Back button
         if (btnBack != null) {
-            btnBack.setOnClickListener(v -> {
-                navigateToMainActivity();
-            });
+            btnBack.setOnClickListener(v -> navigateToMainActivity());
         }
 
-        btnEditProfile.setOnClickListener(v -> {
-            navigateToEditProfile();
-        });
+        btnEditProfile.setOnClickListener(v -> navigateToEditProfile());
 
         if (btnSettings != null) {
-            btnSettings.setOnClickListener(v -> {
-                showToast("Settings clicked");
-            });
+            btnSettings.setOnClickListener(v -> showToast("Settings clicked"));
         }
     }
-
 
     private void setupBottomNavigation() {
         try {
@@ -112,7 +107,7 @@ public class ProfileActivity extends AppCompatActivity {
                     navigateToMainActivity();
                     return true;
                 } else if (id == R.id.nav_task) {
-                    showToast("Task feature coming soon");
+                    navigateToTaskActivity();
                     return true;
                 } else if (id == R.id.nav_profile) {
                     // Already on profile page
@@ -123,7 +118,6 @@ public class ProfileActivity extends AppCompatActivity {
                 }
                 return false;
             });
-
         } catch (Exception e) {
             Log.e(TAG, "setupBottomNavigation: Error", e);
         }
@@ -137,13 +131,17 @@ public class ProfileActivity extends AppCompatActivity {
         finish();
     }
 
-    // Add this method:
-    private void navigateToEditProfile() {
-        Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-        startActivityForResult(intent, 1001); // Use request code to refresh data when returning
+    private void navigateToTaskActivity() {
+        Intent intent = new Intent(ProfileActivity.this, TaskActivity.class);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
     }
 
-    // Add this to handle result from EditProfileActivity
+    private void navigateToEditProfile() {
+        Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+        startActivityForResult(intent, 1001);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -177,9 +175,15 @@ public class ProfileActivity extends AppCompatActivity {
             String phone = sessionManager.getPhone();
             String semester = sessionManager.getSemester();
             String program = sessionManager.getProgram();
-            String facultyId = sessionManager.getFacultyId();
+            String facultyCode = sessionManager.getFacultyCode(); // Changed from getFacultyId()
             String designation = sessionManager.getDesignation();
-            String intake = sessionManager.getIntake();
+            String intake = String.valueOf(sessionManager.getIntake()); // Changed to String
+            String cgpa = sessionManager.getCgpa();
+            int section = sessionManager.getSection();
+
+            String userType = sessionManager.getUserType();
+            boolean isStudent = sessionManager.isStudent();
+            boolean isFaculty = sessionManager.isFaculty();
 
             // Set basic user info
             if (tvUserName != null && userName != null) {
@@ -190,13 +194,72 @@ public class ProfileActivity extends AppCompatActivity {
                 tvEmail.setText(userEmail);
             }
 
-            // Set user details with fallback values
-            if (tvStudentId != null) {
-                String displayStudentId = studentId != null ? studentId :
-                        (facultyId != null ? facultyId : "Not assigned");
-                tvStudentId.setText(displayStudentId);
+            // Display user type specific information
+            if (isStudent) {
+                // Student specific data
+                if (tvStudentId != null) {
+                    String displayStudentId = studentId != null ? studentId : "Not assigned";
+                    tvStudentId.setText(displayStudentId);
+                }
+
+                if (tvSemester != null) {
+                    String displaySemester = semester != null ? semester + " Semester" : "Not specified";
+                    tvSemester.setText(displaySemester);
+                }
+
+                if (tvBatch != null) {
+                    String batchText = "Intake: " + intake + ", Section: " + section;
+                    if (cgpa != null) {
+                        batchText += ", CGPA: " + cgpa;
+                    }
+                    tvBatch.setText(batchText);
+                }
+
+                if (tvDesignation != null) {
+                    tvDesignation.setText("Student");
+                    tvDesignation.setVisibility(View.VISIBLE);
+                }
+            } else if (isFaculty) {
+                // Faculty specific data
+                if (tvStudentId != null) {
+                    String displayFacultyCode = facultyCode != null ? facultyCode : "Not assigned";
+                    tvStudentId.setText("Faculty Code: " + displayFacultyCode);
+                }
+
+                if (tvSemester != null) {
+                    String displaySemester = designation != null ? designation : "Faculty Member";
+                    tvSemester.setText(displaySemester);
+                }
+
+                if (tvBatch != null) {
+                    tvBatch.setText("Faculty");
+                }
+
+                if (tvDesignation != null) {
+                    tvDesignation.setText(designation != null ? designation : "Faculty");
+                    tvDesignation.setVisibility(View.VISIBLE);
+                }
+            } else {
+                // Other user types (admin, etc.)
+                if (tvStudentId != null) {
+                    tvStudentId.setText("User ID: " + sessionManager.getUserId());
+                }
+
+                if (tvSemester != null) {
+                    tvSemester.setText("User Type: " + userType);
+                }
+
+                if (tvBatch != null) {
+                    tvBatch.setText("System User");
+                }
+
+                if (tvDesignation != null) {
+                    tvDesignation.setText(userType);
+                    tvDesignation.setVisibility(View.VISIBLE);
+                }
             }
 
+            // Common data for all users
             if (tvDepartment != null) {
                 String displayDepartment = department != null ? department :
                         (program != null ? program : "Not specified");
@@ -208,30 +271,47 @@ public class ProfileActivity extends AppCompatActivity {
                 tvPhone.setText(displayPhone);
             }
 
-            if (tvSemester != null) {
-                String displaySemester = semester != null ? semester + " Semester" :
-                        (designation != null ? designation : "Not specified");
-                tvSemester.setText(displaySemester);
-            }
-
-            if (tvBatch != null) {
-                tvBatch.setText(intake);
-            }
-
-            String profilePictureBase64 = sessionManager.getProfilePictureUri();
-            if (profilePictureBase64 != null && !profilePictureBase64.isEmpty() && ivProfile != null) {
-                try {
-                    byte[] decodedBytes = Base64.decode(profilePictureBase64, Base64.DEFAULT);
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-                    ivProfile.setImageBitmap(bitmap);
-                } catch (Exception e) {
-                    Log.e(TAG, "Error loading profile picture: " + e.getMessage());
-                    // Use default image if there's an error
-                    ivProfile.setImageResource(R.drawable.ic_person);
-                }
-            }
+            // Load profile picture
+            loadProfilePicture();
         } catch (Exception e) {
             Log.e(TAG, "loadUserData: Error", e);
+        }
+    }
+
+    private void loadProfilePicture() {
+        try {
+            // Get profile picture from session manager
+            String profilePicturePath = sessionManager.getProfilePicture();
+
+            if (profilePicturePath != null && !profilePicturePath.isEmpty() && ivProfile != null) {
+                // If it's a Base64 string (for local storage)
+                if (profilePicturePath.startsWith("data:image") || profilePicturePath.startsWith("/9j/")) {
+                    try {
+                        // Extract base64 part if it's a data URL
+                        String base64Data = profilePicturePath;
+                        if (profilePicturePath.contains(",")) {
+                            base64Data = profilePicturePath.substring(profilePicturePath.indexOf(",") + 1);
+                        }
+
+                        byte[] decodedBytes = Base64.decode(base64Data, Base64.DEFAULT);
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                        ivProfile.setImageBitmap(bitmap);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error decoding Base64 profile picture: " + e.getMessage());
+                        ivProfile.setImageResource(R.drawable.ic_person);
+                    }
+                } else {
+                    // If it's a URL path, you would need to load it with Glide/Picasso
+                    // For now, show default image
+                    ivProfile.setImageResource(R.drawable.ic_person);
+                }
+            } else {
+                // Set default profile image
+                ivProfile.setImageResource(R.drawable.ic_person);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "loadProfilePicture: Error", e);
+            ivProfile.setImageResource(R.drawable.ic_person);
         }
     }
 
@@ -253,6 +333,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         navigateToMainActivity();
     }
 }

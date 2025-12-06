@@ -12,7 +12,7 @@ public interface ApiService {
     @POST("register")
     Call<LoginResponse> register(@Body RegisterRequest registerRequest);
 
-    @GET("user")
+    @GET("me")
     Call<UserResponse> getUser(@Header("Authorization") String token);
 
     @POST("logout")
@@ -21,12 +21,13 @@ public interface ApiService {
     @GET("notices")
     Call<NoticesResponse> getNotices(@Header("Authorization") String token);
 
-    @GET("routine")
+    @POST("routine")
+    @FormUrlEncoded
     Call<RoutineResponse> getRoutine(
             @Header("Authorization") String token,
-            @Query("program") String program,
-            @Query("semester") String semester,
-            @Query("intake") String intake
+            @Field("program") String program,
+            @Field("intake") String intake,
+            @Field("section") String section
     );
 
     @PUT("profile")

@@ -141,15 +141,4 @@
 
     </androidx.cardview.widget.CardView>
 
-    <!-- Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:menu="@menu/bottom_nav_menu"
-        app:labelVisibilityMode="labeled"
-        app:itemIconTint="@color/nav_color_state"
-        app:itemTextColor="@color/nav_color_state"/>
-
 </LinearLayout>

@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.octosync.bubtnexus.models.ProfileUpdateRequest;
 import com.octosync.bubtnexus.models.ProfileUpdateResponse;
+import com.octosync.bubtnexus.models.User;
 import com.octosync.bubtnexus.network.ApiClient;
 import com.octosync.bubtnexus.network.ApiService;
 import com.octosync.bubtnexus.utils.SessionManager;
@@ -36,7 +37,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private static final String TAG = "EditProfileActivity";
     private static final int PICK_IMAGE_REQUEST = 1;
 
-    private EditText etName, etEmail, etPhone, etStudentId, etDepartment, etSemester, etIntake, etAddress;
+    private EditText etName, etEmail, etPhone, etStudentId, etFacultyCode, etDepartment, etSemester, etIntake, etAddress, etDesignation, etCgpa;
     private ImageView ivProfile;
     private MaterialButton btnSave, btnCancel;
     private ImageButton btnBack;
@@ -45,6 +46,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private ApiService apiService;
     private Bitmap selectedBitmap;
+    private Uri selectedImageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,7 @@ public class EditProfileActivity extends AppCompatActivity {
         initializeViews();
         setupClickListeners();
         loadCurrentUserData();
+        setupFieldsByUserType();
     }
 
     private void initializeViews() {
@@ -65,10 +68,13 @@ public class EditProfileActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
         etStudentId = findViewById(R.id.etStudentId);
+        etFacultyCode = findViewById(R.id.etFacultyCode);
         etDepartment = findViewById(R.id.etDepartment);
         etSemester = findViewById(R.id.etSemester);
         etIntake = findViewById(R.id.etIntake);
         etAddress = findViewById(R.id.etAddress);
+        etDesignation = findViewById(R.id.etDesignation);
+        etCgpa = findViewById(R.id.etCgpa);
 
         // Image and Buttons
         ivProfile = findViewById(R.id.ivProfile);
@@ -78,40 +84,115 @@ public class EditProfileActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
     }
 
+    private void setupFieldsByUserType() {
+        boolean isStudent = sessionManager.isStudent();
+        boolean isFaculty = sessionManager.isFaculty();
+
+        // Find label views
+        View tvStudentIdLabel = findViewById(R.id.tvStudentIdLabel);
+        View tvFacultyCodeLabel = findViewById(R.id.tvFacultyCodeLabel);
+        View tvSemesterLabel = findViewById(R.id.tvSemesterLabel);
+        View tvCgpaLabel = findViewById(R.id.tvCgpaLabel);
+        View tvDesignationLabel = findViewById(R.id.tvDesignationLabel);
+
+        // Show/hide student fields
+        if (etStudentId != null) {
+            etStudentId.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+        }
+        if (tvStudentIdLabel != null) {
+            tvStudentIdLabel.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+        }
+
+        // Show/hide faculty fields
+        if (etFacultyCode != null) {
+            etFacultyCode.setVisibility(isFaculty ? View.VISIBLE : View.GONE);
+        }
+        if (tvFacultyCodeLabel != null) {
+            tvFacultyCodeLabel.setVisibility(isFaculty ? View.VISIBLE : View.GONE);
+        }
+
+        // Show/hide semester field (for students)
+        if (etSemester != null) {
+            etSemester.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+        }
+        if (tvSemesterLabel != null) {
+            tvSemesterLabel.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+        }
+
+        // Show/hide CGPA field (for students)
+        if (etCgpa != null) {
+            etCgpa.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+        }
+        if (tvCgpaLabel != null) {
+            tvCgpaLabel.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+        }
+
+        // Show/hide designation field (for faculty)
+        if (etDesignation != null) {
+            etDesignation.setVisibility(isFaculty ? View.VISIBLE : View.GONE);
+        }
+        if (tvDesignationLabel != null) {
+            tvDesignationLabel.setVisibility(isFaculty ? View.VISIBLE : View.GONE);
+        }
+    }
+
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
-
         btnCancel.setOnClickListener(v -> finish());
-
         ivProfile.setOnClickListener(v -> openImagePicker());
-
         btnSave.setOnClickListener(v -> updateProfile());
     }
 
     private void loadCurrentUserData() {
-        // Load current user data into form
-        etName.setText(sessionManager.getUserName());
-        etEmail.setText(sessionManager.getUserEmail());
-        etPhone.setText(sessionManager.getPhone() != null ? sessionManager.getPhone() : "");
-        etStudentId.setText(sessionManager.getStudentId() != null ? sessionManager.getStudentId() : "");
-        etDepartment.setText(sessionManager.getDepartment() != null ? sessionManager.getDepartment() : "");
-        etSemester.setText(sessionManager.getSemester() != null ? sessionManager.getSemester() : "");
-        etAddress.setText(sessionManager.getAddress() != null ? sessionManager.getAddress() : "");
-        etIntake.setText(sessionManager.getIntake() != null ? sessionManager.getIntake() : "");
+        try {
+            // Load current user data into form
+            etName.setText(sessionManager.getUserName());
+            etEmail.setText(sessionManager.getUserEmail());
+            etPhone.setText(sessionManager.getPhone() != null ? sessionManager.getPhone() : "");
+            etDepartment.setText(sessionManager.getDepartment() != null ? sessionManager.getDepartment() : "");
 
-        // Load profile picture from base64 string if exists
-        String savedImageBase64 = sessionManager.getProfilePictureUri();
-        if (savedImageBase64 != null && !savedImageBase64.isEmpty()) {
-            try {
-                byte[] decodedBytes = Base64.decode(savedImageBase64, Base64.DEFAULT);
-                Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-                ivProfile.setImageBitmap(bitmap);
-                selectedBitmap = bitmap;
-            } catch (Exception e) {
-                Log.e(TAG, "Error loading saved profile picture: " + e.getMessage());
-                // Use default image if there's an error
-                ivProfile.setImageResource(R.drawable.ic_person);
+            // Load user type specific data
+            if (sessionManager.isStudent()) {
+                etStudentId.setText(sessionManager.getStudentId() != null ? sessionManager.getStudentId() : "");
+                etSemester.setText(sessionManager.getSemester() != null ? sessionManager.getSemester() : "");
+                etCgpa.setText(sessionManager.getCgpa() != null ? sessionManager.getCgpa() : "");
+                etIntake.setText(sessionManager.getIntake() > 0 ? String.valueOf(sessionManager.getIntake()) : "");
             }
+
+            if (sessionManager.isFaculty()) {
+                etFacultyCode.setText(sessionManager.getFacultyCode() != null ? sessionManager.getFacultyCode() : "");
+                etDesignation.setText(sessionManager.getDesignation() != null ? sessionManager.getDesignation() : "");
+            }
+
+            // Load profile picture from session
+            loadProfilePicture();
+        } catch (Exception e) {
+            Log.e(TAG, "Error loading user data: " + e.getMessage());
+            Toast.makeText(this, "Error loading user data", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loadProfilePicture() {
+        try {
+            String profilePicturePath = sessionManager.getProfilePicture();
+            if (profilePicturePath != null && !profilePicturePath.isEmpty()) {
+                // Handle Base64 encoded image
+                if (profilePicturePath.startsWith("data:image") || profilePicturePath.startsWith("/9j/")) {
+                    String base64Data = profilePicturePath;
+                    if (profilePicturePath.contains(",")) {
+                        base64Data = profilePicturePath.substring(profilePicturePath.indexOf(",") + 1);
+                    }
+
+                    byte[] decodedBytes = Base64.decode(base64Data, Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                    if (bitmap != null) {
+                        ivProfile.setImageBitmap(bitmap);
+                        selectedBitmap = bitmap;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error loading profile picture: " + e.getMessage());
         }
     }
 
@@ -122,7 +203,7 @@ public class EditProfileActivity extends AppCompatActivity {
             startActivityForResult(intent, PICK_IMAGE_REQUEST);
         } catch (Exception e) {
             Log.e(TAG, "Error opening image picker: " + e.getMessage());
-            showToast("Cannot open image picker");
+            Toast.makeText(this, "Cannot open image picker", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -130,10 +211,9 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
-            Uri selectedImageUri = data.getData();
+            selectedImageUri = data.getData();
             if (selectedImageUri != null) {
                 try {
-                    // Use InputStream to decode the bitmap safely
                     InputStream inputStream = getContentResolver().openInputStream(selectedImageUri);
                     if (inputStream != null) {
                         selectedBitmap = BitmapFactory.decodeStream(inputStream);
@@ -143,22 +223,20 @@ public class EditProfileActivity extends AppCompatActivity {
                             // Resize bitmap to avoid memory issues
                             selectedBitmap = getResizedBitmap(selectedBitmap, 400);
                             ivProfile.setImageBitmap(selectedBitmap);
-
-                            // Convert bitmap to base64 and save to SharedPreferences
-                            String base64Image = bitmapToBase64(selectedBitmap);
-                            sessionManager.saveProfilePictureUri(base64Image);
-                            showToast("Profile picture updated");
+                            Toast.makeText(this, "Profile picture selected", Toast.LENGTH_SHORT).show();
                         }
                     }
                 } catch (Exception e) {
                     Log.e(TAG, "Error loading selected image: " + e.getMessage());
-                    showToast("Error loading image");
+                    Toast.makeText(this, "Error loading image", Toast.LENGTH_SHORT).show();
                 }
             }
         }
     }
 
     private Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        if (image == null) return null;
+
         int width = image.getWidth();
         int height = image.getHeight();
 
@@ -174,21 +252,12 @@ public class EditProfileActivity extends AppCompatActivity {
         return Bitmap.createScaledBitmap(image, width, height, true);
     }
 
-    private String bitmapToBase64(Bitmap bitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(byteArray, Base64.DEFAULT);
-    }
-
     private void updateProfile() {
+        // Get form values
         String name = etName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
-        String studentId = etStudentId.getText().toString().trim();
         String department = etDepartment.getText().toString().trim();
-        String semester = etSemester.getText().toString().trim();
-        String intake = etIntake.getText().toString().trim();
         String address = etAddress.getText().toString().trim();
 
         // Basic validation
@@ -202,93 +271,86 @@ public class EditProfileActivity extends AppCompatActivity {
             return;
         }
 
+        // Get user type specific fields
+        String studentId = "";
+        String semester = "";
+        String cgpa = "";
+        String intake = "";
+        String facultyCode = "";
+        String designation = "";
+
+        if (sessionManager.isStudent()) {
+            studentId = etStudentId.getText().toString().trim();
+            semester = etSemester.getText().toString().trim();
+            cgpa = etCgpa.getText().toString().trim();
+            intake = etIntake.getText().toString().trim();
+        }
+
+        if (sessionManager.isFaculty()) {
+            facultyCode = etFacultyCode.getText().toString().trim();
+            designation = etDesignation.getText().toString().trim();
+        }
+
         showLoading(true);
 
+        // Create update request
         ProfileUpdateRequest updateRequest = new ProfileUpdateRequest();
         updateRequest.setName(name);
         updateRequest.setEmail(email);
         updateRequest.setPhone(phone.isEmpty() ? null : phone);
-        updateRequest.setStudentId(studentId.isEmpty() ? null : studentId);
         updateRequest.setDepartment(department.isEmpty() ? null : department);
-        updateRequest.setSemester(semester.isEmpty() ? null : semester);
-        updateRequest.setIntake(intake.isEmpty() ? null : intake);
-        updateRequest.setAddress(address.isEmpty() ? null : address);
+
+        // Add user type specific fields
+        if (sessionManager.isStudent()) {
+            updateRequest.setStudentId(studentId.isEmpty() ? null : studentId);
+            updateRequest.setSemester(semester.isEmpty() ? null : semester);
+            updateRequest.setCgpa(cgpa.isEmpty() ? null : cgpa);
+            updateRequest.setIntake(intake.isEmpty() ? null : intake);
+        }
+
+        if (sessionManager.isFaculty()) {
+            updateRequest.setFacultyCode(facultyCode.isEmpty() ? null : facultyCode);
+            updateRequest.setDesignation(designation.isEmpty() ? null : designation);
+        }
 
         String token = sessionManager.getToken();
-        if (token == null) {
-            showToast("Please login again");
+        if (token == null || token.isEmpty()) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
             showLoading(false);
+            redirectToLogin();
             return;
         }
 
-        Log.d(TAG, "Updating profile with data:");
-        Log.d(TAG, "Name: " + name);
-        Log.d(TAG, "Email: " + email);
-        Log.d(TAG, "Phone: " + phone);
-        Log.d(TAG, "Student ID: " + studentId);
-        Log.d(TAG, "Department: " + department);
-        Log.d(TAG, "Intake: " + intake);
-        Log.d(TAG, "Semester: " + semester);
+        // Clean token (remove "Bearer " if already present)
+        String cleanToken = token.startsWith("Bearer ") ? token.substring(7) : token;
 
-        Call<ProfileUpdateResponse> call = apiService.updateProfile("Bearer " + token, updateRequest);
+        Log.d(TAG, "Updating profile...");
+
+        Call<ProfileUpdateResponse> call = apiService.updateProfile("Bearer " + cleanToken, updateRequest);
 
         call.enqueue(new Callback<ProfileUpdateResponse>() {
             @Override
             public void onResponse(Call<ProfileUpdateResponse> call, Response<ProfileUpdateResponse> response) {
                 showLoading(false);
 
-                Log.d(TAG, "Response Code: " + response.code());
-                Log.d(TAG, "Response Message: " + response.message());
+                if (response.isSuccessful() && response.body() != null) {
+                    ProfileUpdateResponse updateResponse = response.body();
 
-                if (response.isSuccessful()) {
-                    if (response.body() != null) {
-                        ProfileUpdateResponse updateResponse = response.body();
-                        Log.d(TAG, "Response Success: " + updateResponse.isSuccess());
-                        Log.d(TAG, "Response Message: " + updateResponse.getMessage());
+                    if (updateResponse.isSuccess()) {
+                        // Update session with new data
+                        updateSessionData(updateResponse);
 
-                        if (updateResponse.isSuccess()) {
-                            // Update session with new data
-                            updateSessionData();
-                            showToast("Profile updated successfully");
-                            setResult(RESULT_OK);
-                            finish();
-                        } else {
-                            String errorMsg = updateResponse.getMessage() != null ?
-                                    updateResponse.getMessage() : "Update failed";
-                            showToast(errorMsg);
-                            Log.e(TAG, "API returned success: false - " + errorMsg);
-                        }
+                        Toast.makeText(EditProfileActivity.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                        setResult(RESULT_OK);
+                        finish();
                     } else {
-                        showToast("Empty response from server");
-                        Log.e(TAG, "Response body is null");
+                        String errorMsg = updateResponse.getMessage() != null ?
+                                updateResponse.getMessage() : "Update failed";
+                        Toast.makeText(EditProfileActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "API returned success: false - " + errorMsg);
                     }
                 } else {
-                    // Handle HTTP errors
-                    String errorMessage = "Failed to update profile";
-                    if (response.code() == 401) {
-                        errorMessage = "Session expired. Please login again.";
-                        sessionManager.clear();
-                        redirectToLogin();
-                    } else if (response.code() == 422) {
-                        errorMessage = "Validation error. Please check your input.";
-                    } else if (response.code() == 500) {
-                        errorMessage = "Server error. Please try again later.";
-                    }
-
-                    // Try to read error body for more details
-                    if (response.errorBody() != null) {
-                        try {
-                            String errorBody = response.errorBody().string();
-                            Log.e(TAG, "Error Body: " + errorBody);
-                            showToast("Error: " + errorBody);
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error reading error body: " + e.getMessage());
-                            showToast(errorMessage);
-                        }
-                    } else {
-                        showToast(errorMessage);
-                    }
-                    Log.e(TAG, "HTTP Error: " + response.code() + " - " + response.message());
+                    handleErrorResponse(response);
                 }
             }
 
@@ -296,30 +358,71 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onFailure(Call<ProfileUpdateResponse> call, Throwable t) {
                 showLoading(false);
                 Log.e(TAG, "Profile update failed: " + t.getMessage(), t);
-                showToast("Network error: " + t.getMessage());
+                Toast.makeText(EditProfileActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void updateSessionData() {
-        // Update session with form data
-        String name = etName.getText().toString().trim();
-        String email = etEmail.getText().toString().trim();
-        String phone = etPhone.getText().toString().trim();
-        String studentId = etStudentId.getText().toString().trim();
-        String department = etDepartment.getText().toString().trim();
-        String semester = etSemester.getText().toString().trim();
-        String intake = etIntake.getText().toString().trim();
-        String address = etAddress.getText().toString().trim();
+    private String bitmapToBase64(Bitmap bitmap) {
+        if (bitmap == null) return "";
 
-        sessionManager.updateUserName(name);
-        sessionManager.updateUserEmail(email);
-        sessionManager.updateStudentId(studentId);
-        sessionManager.updateUserPhone(phone);
-        sessionManager.updateUserDepartment(department);
-        sessionManager.updateUserSemester(semester);
-        sessionManager.updateIntake(intake);
-        sessionManager.updateUserAddress(address);
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+            return Base64.encodeToString(byteArray, Base64.DEFAULT);
+        } catch (Exception e) {
+            Log.e(TAG, "Error converting bitmap to Base64: " + e.getMessage());
+            return "";
+        }
+    }
+
+    private void updateSessionData(ProfileUpdateResponse updateResponse) {
+        if (updateResponse.getData() != null && updateResponse.getData().getUser() != null) {
+            User user = updateResponse.getData().getUser();
+
+            // Update session data
+            sessionManager.saveUserData(
+                    user.getName(),
+                    user.getEmail(),
+                    user.getUserType(),
+                    user.isStudent(),
+                    user.isFaculty()
+            );
+
+            // Update user details if available
+            if (user.getDetails() != null) {
+                sessionManager.saveUserDetails(user.getDetails());
+            }
+        }
+    }
+
+    private void handleErrorResponse(Response<ProfileUpdateResponse> response) {
+        String errorMessage = "Failed to update profile";
+
+        if (response.code() == 401) {
+            errorMessage = "Session expired. Please login again.";
+            sessionManager.clear();
+            redirectToLogin();
+        } else if (response.code() == 422) {
+            errorMessage = "Validation error. Please check your input.";
+        } else if (response.code() == 500) {
+            errorMessage = "Server error. Please try again later.";
+        }
+
+        // Try to read error body for more details
+        try {
+            if (response.errorBody() != null) {
+                String errorBody = response.errorBody().string();
+                Log.e(TAG, "Error Body: " + errorBody);
+                Toast.makeText(this, "Error: " + errorBody, Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error reading error body: " + e.getMessage());
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void redirectToLogin() {
@@ -332,10 +435,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private void showLoading(boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         btnSave.setEnabled(!show);
-    }
-
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        btnCancel.setEnabled(!show);
     }
 
     @Override
