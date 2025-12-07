@@ -37,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
     private GridLayout gridButtons; // This is GridLayout in XML
     private CardView contentCard;
 
+    // Individual button views
+    private LinearLayout btnRoutine, btnAssignments, btnNotices, btnCommunity, btnEvents, btnRide;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +87,14 @@ public class MainActivity extends AppCompatActivity {
         tvUserInfo = findViewById(R.id.tvUserInfo);
         tvSectionTitle = findViewById(R.id.tvSectionTitle);
 
+        // Initialize individual buttons
+        btnRoutine = findViewById(R.id.btnRoutine);
+        btnAssignments = findViewById(R.id.btnAssignments);
+        btnNotices = findViewById(R.id.btnNotices);
+        btnCommunity = findViewById(R.id.btnCommunity);
+        btnEvents = findViewById(R.id.btnEvents);
+        btnRide = findViewById(R.id.btnRide);
+
         // Set welcome message with stored user name
         String userName = sessionManager.getUserName();
         if (userName != null && !userName.isEmpty()) {
@@ -117,8 +128,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showStudentContent() {
-        // Show student-specific content
+        // Show all grid buttons for students
         gridButtons.setVisibility(View.VISIBLE);
+
+        // Show all student-specific buttons
+        btnRoutine.setVisibility(View.VISIBLE);
+        btnAssignments.setVisibility(View.VISIBLE);
+        btnNotices.setVisibility(View.VISIBLE);
+        btnCommunity.setVisibility(View.VISIBLE);
+        btnEvents.setVisibility(View.VISIBLE);
+        btnRide.setVisibility(View.VISIBLE);
+
         if (tvSectionTitle != null) {
             tvSectionTitle.setVisibility(View.VISIBLE);
         }
@@ -165,16 +185,25 @@ public class MainActivity extends AppCompatActivity {
             tvUserInfo.setText(studentInfo.toString());
             tvUserInfo.setVisibility(View.VISIBLE);
         }
-
-        // Log for debugging
-//        Log.d(TAG, "Student Content - Student ID: " + studentId + "Program Code: " + programCode + "Program Name: " + programName + "Intake: " + intake+ "Section: " + section+ "CGPA: " + cgpa);
     }
 
     private void showFacultyContent() {
-        // Hide the grid buttons for faculty
-        gridButtons.setVisibility(View.GONE);
+        // Show the grid for faculty
+        gridButtons.setVisibility(View.VISIBLE);
+
+        // Hide student-specific buttons
+        btnRoutine.setVisibility(View.GONE);
+        btnAssignments.setVisibility(View.GONE);
+
+        // Show common buttons for faculty (including Ride button)
+        btnNotices.setVisibility(View.VISIBLE);
+        btnCommunity.setVisibility(View.VISIBLE);
+        btnEvents.setVisibility(View.VISIBLE);
+        btnRide.setVisibility(View.VISIBLE);
+
         if (tvSectionTitle != null) {
-            tvSectionTitle.setVisibility(View.GONE);
+            tvSectionTitle.setVisibility(View.VISIBLE);
+            tvSectionTitle.setText("Quick Access");
         }
 
         // Update welcome message for faculty
@@ -192,11 +221,23 @@ public class MainActivity extends AppCompatActivity {
             tvUserInfo.setText(facultyInfo);
             tvUserInfo.setVisibility(View.VISIBLE);
         }
+
+        // Debug log to check which buttons are visible
+        Log.d(TAG, "Faculty Content - Ride button visibility: " + btnRide.getVisibility());
     }
 
     private void showDefaultContent() {
         // Show default content for other user types
         gridButtons.setVisibility(View.VISIBLE);
+
+        // Show all buttons by default
+        btnRoutine.setVisibility(View.VISIBLE);
+        btnAssignments.setVisibility(View.VISIBLE);
+        btnNotices.setVisibility(View.VISIBLE);
+        btnCommunity.setVisibility(View.VISIBLE);
+        btnEvents.setVisibility(View.VISIBLE);
+        btnRide.setVisibility(View.VISIBLE);
+
         if (tvSectionTitle != null) {
             tvSectionTitle.setVisibility(View.VISIBLE);
         }
@@ -207,27 +248,37 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         // Student-specific buttons - only visible for students
-        if (sessionManager.isStudent() || "Student".equals(sessionManager.getUserType())) {
-            findViewById(R.id.btnRoutine).setOnClickListener(v -> {
+        btnRoutine.setOnClickListener(v -> {
+            if (sessionManager.isStudent() || "Student".equals(sessionManager.getUserType())) {
                 Intent intent = new Intent(MainActivity.this, RoutineActivity.class);
                 startActivity(intent);
-            });
-            findViewById(R.id.btnAssignments).setOnClickListener(v -> {
+            } else {
+                showToast("This feature is for students only");
+            }
+        });
+
+        btnAssignments.setOnClickListener(v -> {
+            if (sessionManager.isStudent() || "Student".equals(sessionManager.getUserType())) {
                 Intent intent = new Intent(MainActivity.this, AssignmentActivity.class);
                 startActivity(intent);
-            });
-            findViewById(R.id.btnNotices).setOnClickListener(v -> {
-                Intent intent = new Intent(MainActivity.this, NoticeActivity.class);
-                startActivity(intent);
-            });
-        }
+            } else {
+                showToast("This feature is for students only");
+            }
+        });
+
+        btnNotices.setOnClickListener(v -> {
+            // Notices should be visible to both students and faculty
+            Intent intent = new Intent(MainActivity.this, NoticeActivity.class);
+            startActivity(intent);
+        });
 
         // Common buttons for all users
-        findViewById(R.id.btnCommunity).setOnClickListener(v -> openSection("Community"));
-        findViewById(R.id.btnEvents).setOnClickListener(v -> openSection("Events"));
-        findViewById(R.id.btnRide).setOnClickListener(v -> {
+        btnCommunity.setOnClickListener(v -> openSection("Community"));
+        btnEvents.setOnClickListener(v -> openSection("Events"));
+        btnRide.setOnClickListener(v -> {
             navigateToRideSharingActivity();
         });
+
         etSearch.setOnClickListener(v -> showToast("Search opened"));
     }
 

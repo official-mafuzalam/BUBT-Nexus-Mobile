@@ -72,4 +72,11 @@ public interface ApiService {
             @Path("requestId") int requestId,
             @Body UpdatePassengerRequestActionRequest request
     );
+
+    @PUT("/api/rides/{rideId}/status")
+    Call<UpdateRideStatusResponse> updateRideStatus(
+            @Header("Authorization") String token,
+            @Path("rideId") int rideId,
+            @Body UpdateRideStatusRequest request
+    );
 }

@@ -25,7 +25,16 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import com.octosync.bubtnexus.models.NominatimResponse;
+import com.octosync.bubtnexus.network.GeocodingClient;
+import com.octosync.bubtnexus.network.GeocodingService;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import java.text.DecimalFormat;
+import java.util.List;
 
 public class MapPickerActivity extends AppCompatActivity {
 
@@ -56,8 +65,8 @@ public class MapPickerActivity extends AppCompatActivity {
     private String locationType = ""; // "from" or "to"
 
     // BUBT Coordinates
-    private static final double BUBT_LATITUDE = 23.810331;
-    private static final double BUBT_LONGITUDE = 90.412521;
+    private static final double BUBT_LATITUDE = 23.811706;
+    private static final double BUBT_LONGITUDE = 90.357175;
     private static final String BUBT_ADDRESS = "BUBT, Dhaka";
 
     @Override
@@ -125,8 +134,34 @@ public class MapPickerActivity extends AppCompatActivity {
         btnUseMyLocation.setOnClickListener(v -> {
             if (myLocationOverlay != null && myLocationOverlay.getMyLocation() != null) {
                 GeoPoint myLocation = myLocationOverlay.getMyLocation();
-                handleMapTap(myLocation);
+                selectedLatitude = myLocation.getLatitude();
+                selectedLongitude = myLocation.getLongitude();
+
+                // Update coordinates display
+                tvSelectedCoordinates.setText(String.format("Lat: %s, Lng: %s",
+                        decimalFormat.format(selectedLatitude),
+                        decimalFormat.format(selectedLongitude)));
+
+                // Add/update marker
+                if (selectedMarker == null) {
+                    selectedMarker = new Marker(mapView);
+                    selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                    selectedMarker.setIcon(getResources().getDrawable(R.drawable.ic_location));
+                    mapView.getOverlays().add(selectedMarker);
+                }
+
+                selectedMarker.setPosition(myLocation);
+                mapView.invalidate();
+
+                // Show location info panel
+                llLocationInfo.setVisibility(View.VISIBLE);
+
+                // Center map on location
                 mapController.setCenter(myLocation);
+
+                // Get address from coordinates
+                reverseGeocode(selectedLatitude, selectedLongitude);
+
                 Toast.makeText(this, "Selected your current location", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Unable to get your location. Please enable GPS.", Toast.LENGTH_SHORT).show();
@@ -206,14 +241,12 @@ public class MapPickerActivity extends AppCompatActivity {
         // Show location info panel
         llLocationInfo.setVisibility(View.VISIBLE);
 
-        // Check if tapped location is near BUBT
+        // Always try to get address from coordinates using reverse geocoding
+        reverseGeocode(selectedLatitude, selectedLongitude);
+
+        // Check if near BUBT for special handling
         if (isNearBUBT(selectedLatitude, selectedLongitude)) {
-            selectedAddress = BUBT_ADDRESS;
-            tvSelectedAddress.setText(selectedAddress);
-            Toast.makeText(this, "Selected BUBT Campus", Toast.LENGTH_SHORT).show();
-        } else {
-            // Try to get address from coordinates
-            reverseGeocode(selectedLatitude, selectedLongitude);
+            Toast.makeText(this, "Near BUBT Campus", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -226,9 +259,9 @@ public class MapPickerActivity extends AppCompatActivity {
     private void searchAddress(String query) {
         showLoading(true);
 
+        // Handle BUBT search
         if (query.equalsIgnoreCase("bubt") || query.contains("bubt") ||
                 query.contains("bangladesh university")) {
-            // Automatically select BUBT
             GeoPoint bubtPoint = new GeoPoint(BUBT_LATITUDE, BUBT_LONGITUDE);
             handleMapTap(bubtPoint);
             mapController.setCenter(bubtPoint);
@@ -238,23 +271,119 @@ public class MapPickerActivity extends AppCompatActivity {
             return;
         }
 
-        // TODO: Implement address search using Nominatim/Photon API
-        // For now, show a message
-        Toast.makeText(this, "Address search coming soon. Try searching 'BUBT' or tap on the map.", Toast.LENGTH_SHORT).show();
-        showLoading(false);
+        // Use Nominatim for forward geocoding
+        GeocodingService geocodingService = GeocodingClient.getClient();
+        Call<List<NominatimResponse>> call = geocodingService.forwardGeocode(
+                query,
+                "json",
+                5 // limit results to 5
+        );
+
+        call.enqueue(new Callback<List<NominatimResponse>>() {
+            @Override
+            public void onResponse(Call<List<NominatimResponse>> call, Response<List<NominatimResponse>> response) {
+                showLoading(false);
+
+                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                    // Get the first result
+                    NominatimResponse result = response.body().get(0);
+
+                    // Extract coordinates
+                    double lat = Double.parseDouble(result.getLat());
+                    double lon = Double.parseDouble(result.getLon());
+
+                    // Create GeoPoint and select it
+                    GeoPoint point = new GeoPoint(lat, lon);
+                    handleMapTap(point);
+                    mapController.setCenter(point);
+
+                    // Update search field with found address
+                    etSearch.setText(result.getDisplayName());
+
+                    Toast.makeText(MapPickerActivity.this,
+                            "Found location: " + result.getDisplayName(),
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MapPickerActivity.this,
+                            "No results found for: " + query,
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<NominatimResponse>> call, Throwable t) {
+                showLoading(false);
+                Toast.makeText(MapPickerActivity.this,
+                        "Search failed. Please try again.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void reverseGeocode(double latitude, double longitude) {
         showLoading(true);
 
-        // TODO: Implement reverse geocoding using Nominatim API
-        // For now, just show coordinates
-        selectedAddress = String.format("Location at %s, %s",
-                decimalFormat.format(latitude),
-                decimalFormat.format(longitude));
-        tvSelectedAddress.setText(selectedAddress);
+        GeocodingService geocodingService = GeocodingClient.getClient();
+        Call<NominatimResponse> call = geocodingService.reverseGeocode(
+                latitude,
+                longitude,
+                "json",
+                18, // zoom level
+                1   // addressdetails
+        );
 
-        showLoading(false);
+        call.enqueue(new Callback<NominatimResponse>() {
+            @Override
+            public void onResponse(Call<NominatimResponse> call, Response<NominatimResponse> response) {
+                showLoading(false);
+
+                if (response.isSuccessful() && response.body() != null) {
+                    NominatimResponse nominatimResponse = response.body();
+
+                    // Get address from response
+                    String address = nominatimResponse.getDisplayName();
+
+                    // Alternative: Get formatted address from address object
+                    if (nominatimResponse.getAddress() != null) {
+                        String formattedAddress = nominatimResponse.getAddress().getFormattedAddress();
+                        if (formattedAddress != null && !formattedAddress.isEmpty()) {
+                            address = formattedAddress;
+                        }
+                    }
+
+                    // Truncate address if too long
+                    if (address.length() > 100) {
+                        address = address.substring(0, 100) + "...";
+                    }
+
+                    selectedAddress = address;
+                    tvSelectedAddress.setText(selectedAddress);
+
+                } else {
+                    // Fallback to coordinates if geocoding fails
+                    selectedAddress = String.format("Lat: %s, Lng: %s",
+                            decimalFormat.format(latitude),
+                            decimalFormat.format(longitude));
+                    tvSelectedAddress.setText(selectedAddress);
+                    Toast.makeText(MapPickerActivity.this,
+                            "Could not get address name. Using coordinates.",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<NominatimResponse> call, Throwable t) {
+                showLoading(false);
+                // Fallback to coordinates
+                selectedAddress = String.format("Lat: %s, Lng: %s",
+                        decimalFormat.format(latitude),
+                        decimalFormat.format(longitude));
+                tvSelectedAddress.setText(selectedAddress);
+                Toast.makeText(MapPickerActivity.this,
+                        "Network error. Using coordinates.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void returnSelectedLocation() {

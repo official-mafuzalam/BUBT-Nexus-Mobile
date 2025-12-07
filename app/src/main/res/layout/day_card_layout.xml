@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="12dp"
+    app:cardBackgroundColor="?attr/cardBackgroundColor"
     app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:cardBackgroundColor="@color/white">
+    app:cardElevation="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,31 +17,31 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?attr/colorSurfaceVariant"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:background="@color/light_blue"
-            android:paddingVertical="12dp"
             android:paddingHorizontal="16dp"
-            android:gravity="center_vertical">
+            android:paddingVertical="12dp">
 
             <TextView
                 android:id="@+id/tvDayName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
                 android:text="DAY"
-                android:textColor="@color/primary_color"
+                android:textColor="?attr/colorPrimary"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-medium" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvClassCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
                 android:text="0 Classes"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp"
-                android:fontFamily="sans-serif" />
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="12sp" />
 
         </LinearLayout>
 

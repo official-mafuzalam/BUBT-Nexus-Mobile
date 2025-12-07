@@ -11,7 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.octosync.bubtnexus.R;
 import com.octosync.bubtnexus.models.Ride;
 import com.octosync.bubtnexus.utils.SessionManager;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class RideAdapter extends RecyclerView.Adapter<RideAdapter.RideViewHolder> {
 
@@ -19,6 +23,11 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.RideViewHolder
     private OnRideClickListener listener;
     private SessionManager sessionManager;
     private int currentUserId;
+
+    // Date formatters
+    private SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());
+    private SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+    private SimpleDateFormat outputTimeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
 
     public interface OnRideClickListener {
         void onRideClick(Ride ride);
@@ -79,7 +88,7 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.RideViewHolder
         return rides != null ? rides.size() : 0;
     }
 
-    static class RideViewHolder extends RecyclerView.ViewHolder {
+    class RideViewHolder extends RecyclerView.ViewHolder {
         TextView tvFromLocation, tvToLocation, tvDepartureTime, tvSeats, tvFare, tvDistance, tvDriverName;
         Button btnAction;
 
@@ -98,16 +107,66 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.RideViewHolder
         public void bind(Ride ride) {
             tvFromLocation.setText(ride.getFromLocation());
             tvToLocation.setText(ride.getToLocation());
-            tvDepartureTime.setText(ride.getDepartureTime());
+
+            // Format departure time
+            String formattedTime = formatDepartureTime(ride.getDepartureTime());
+            tvDepartureTime.setText(formattedTime);
+
             tvSeats.setText(String.format("%d/%d seats", ride.getAvailableSeats(), ride.getTotalSeats()));
             tvFare.setText(String.format("৳%s per seat", ride.getFarePerSeat()));
-            tvDistance.setText(String.format("%.1f km", ride.getDistance()));
+            tvDistance.setText(String.format("%.1f km away", ride.getDistance()));
 
             // Set driver name
             if (ride.getDriver() != null) {
-                tvDriverName.setText("Driver: " + ride.getDriver().getName());
+                tvDriverName.setText(ride.getDriver().getName());
             } else {
                 tvDriverName.setText("Driver: Unknown");
+            }
+        }
+
+        private String formatDepartureTime(String departureTime) {
+            if (departureTime == null || departureTime.isEmpty()) {
+                return "Not specified";
+            }
+
+            try {
+                // Parse the input date
+                Date date = inputFormat.parse(departureTime);
+
+                // Format date and time separately
+                String dateStr = outputDateFormat.format(date);
+                String timeStr = outputTimeFormat.format(date);
+
+                // Return combined format: "DD-MM-YYYY at hh:mm a"
+                return String.format("%s at %s", dateStr, timeStr);
+
+            } catch (ParseException e) {
+                // Try alternative formats if the first one fails
+                try {
+                    // Try without milliseconds
+                    SimpleDateFormat altFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
+                    Date date = altFormat.parse(departureTime);
+                    String dateStr = outputDateFormat.format(date);
+                    String timeStr = outputTimeFormat.format(date);
+                    return String.format("%s at %s", dateStr, timeStr);
+
+                } catch (ParseException e2) {
+                    // Try one more format without 'Z'
+                    try {
+                        SimpleDateFormat altFormat2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        Date date = altFormat2.parse(departureTime);
+                        String dateStr = outputDateFormat.format(date);
+                        String timeStr = outputTimeFormat.format(date);
+                        return String.format("%s at %s", dateStr, timeStr);
+
+                    } catch (ParseException e3) {
+                        // If all parsing fails, return the original string
+                        return departureTime;
+                    }
+                }
+            } catch (Exception e) {
+                // General exception handling
+                return departureTime;
             }
         }
     }

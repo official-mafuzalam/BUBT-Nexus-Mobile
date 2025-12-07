@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -18,15 +19,21 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.octosync.bubtnexus.adapters.RideAdapter;
 import com.octosync.bubtnexus.models.NearbyRidesResponse;
+import com.octosync.bubtnexus.models.NominatimResponse;
 import com.octosync.bubtnexus.models.Ride;
 import com.octosync.bubtnexus.network.ApiClient;
+import com.octosync.bubtnexus.network.GeocodingClient;
 import com.octosync.bubtnexus.network.ApiService;
+import com.octosync.bubtnexus.network.GeocodingService;
 import com.octosync.bubtnexus.utils.SessionManager;
+
 import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -165,10 +172,11 @@ public class RideSharingActivity extends AppCompatActivity implements RideAdapte
                 getCurrentLocation();
             } else {
                 showError("Location permission denied. Showing default rides.");
-                // Use default location or show error
+                // Use default location
                 currentLatitude = 23.810331;
                 currentLongitude = 90.412521;
-                tvLocation.setText("Dhaka, Bangladesh (Default)");
+                // Get address for default location
+                getAddressFromCoordinates(currentLatitude, currentLongitude);
                 loadNearbyRides();
             }
         }
@@ -182,18 +190,80 @@ public class RideSharingActivity extends AppCompatActivity implements RideAdapte
                         if (location != null) {
                             currentLatitude = location.getLatitude();
                             currentLongitude = location.getLongitude();
-                            tvLocation.setText("Lat: " + String.format("%.4f", currentLatitude) +
-                                    ", Lng: " + String.format("%.4f", currentLongitude));
+                            // Get address name from coordinates
+                            getAddressFromCoordinates(currentLatitude, currentLongitude);
                             loadNearbyRides();
                         } else {
                             showError("Unable to get location. Using default.");
                             currentLatitude = 23.810331;
                             currentLongitude = 90.412521;
-                            tvLocation.setText("Dhaka, Bangladesh (Default)");
+                            // Get address for default location
+                            getAddressFromCoordinates(currentLatitude, currentLongitude);
                             loadNearbyRides();
                         }
                     });
         }
+    }
+
+    private void getAddressFromCoordinates(double latitude, double longitude) {
+        // Check if it's near BUBT (within 1 km)
+        if (isNearBUBT(latitude, longitude)) {
+            tvLocation.setText("Near BUBT Campus, Dhaka");
+            return;
+        }
+
+        // Use Nominatim for reverse geocoding
+        GeocodingService geocodingService = GeocodingClient.getClient();
+        Call<NominatimResponse> call = geocodingService.reverseGeocode(
+                latitude,
+                longitude,
+                "json",
+                18, // zoom level for detailed address
+                1   // include address details
+        );
+
+        call.enqueue(new Callback<NominatimResponse>() {
+            @Override
+            public void onResponse(Call<NominatimResponse> call, Response<NominatimResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    NominatimResponse nominatimResponse = response.body();
+                    String address = nominatimResponse.getAddress().getRoad();
+
+                    // If address is too long, truncate it
+                    if (address.length() > 60) {
+                        // Try to get a shorter address from address components
+                        if (nominatimResponse.getAddress() != null) {
+                            String fullAddress = nominatimResponse.getAddress().getRoad();
+                            address = fullAddress;
+                        } else {
+                            // Truncate the full address
+                            address = address.substring(0, 57) + "...";
+                        }
+                    }
+
+                    tvLocation.setText(address);
+                } else {
+                    // Fallback to coordinates if geocoding fails
+                    tvLocation.setText(String.format("Lat: %.4f, Lng: %.4f", latitude, longitude));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<NominatimResponse> call, Throwable t) {
+                // Fallback to coordinates on network error
+                tvLocation.setText(String.format("Lat: %.4f, Lng: %.4f", latitude, longitude));
+            }
+        });
+    }
+
+    private boolean isNearBUBT(double lat, double lng) {
+        // BUBT coordinates
+        double BUBT_LATITUDE = 23.811706;
+        double BUBT_LONGITUDE = 90.357175;
+
+        // Calculate distance in degrees (approx 1 km radius)
+        double distance = Math.sqrt(Math.pow(lat - BUBT_LATITUDE, 2) + Math.pow(lng - BUBT_LONGITUDE, 2));
+        return distance < 0.01; // Approximately 1 km
     }
 
     private void loadNearbyRides() {

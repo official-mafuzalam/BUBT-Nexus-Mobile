@@ -35,7 +35,6 @@ public class NoticeActivity extends AppCompatActivity {
     private TextView tvError;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ImageButton btnBack;
-    private BottomNavigationView bottomNavigation;
 
     // Adapter and Session
     private NoticeAdapter noticeAdapter;
@@ -57,7 +56,6 @@ public class NoticeActivity extends AppCompatActivity {
 
         initializeViews();
         setupClickListeners();
-        setupBottomNavigation();
         setupRecyclerView();
         loadNotices();
 
@@ -82,36 +80,11 @@ public class NoticeActivity extends AppCompatActivity {
         recyclerViewNotices = findViewById(R.id.recyclerViewNotices);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         btnBack = findViewById(R.id.btnBack);
-        bottomNavigation = findViewById(R.id.bottomNavigation);
     }
 
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
     }
-
-    private void setupBottomNavigation() {
-        // Set appropriate navigation item as selected
-        bottomNavigation.setSelectedItemId(R.id.nav_home);
-
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                navigateToMainActivity();
-                return true;
-            } else if (id == R.id.nav_task) {
-                navigateToTaskActivity();
-                return true;
-            } else if (id == R.id.nav_profile) {
-                navigateToProfileActivity();
-                return true;
-            } else if (id == R.id.nav_logout) {
-                logoutUser();
-                return true;
-            }
-            return false;
-        });
-    }
-
     private void navigateToMainActivity() {
         Intent intent = new Intent(NoticeActivity.this, MainActivity.class);
         startActivity(intent);

@@ -20,6 +20,8 @@ import com.octosync.bubtnexus.models.PassengerRequestResponse;
 import com.octosync.bubtnexus.models.Ride;
 import com.octosync.bubtnexus.models.RideDetailsResponse;
 import com.octosync.bubtnexus.models.UpdatePassengerRequestActionRequest;
+import com.octosync.bubtnexus.models.UpdateRideStatusRequest;
+import com.octosync.bubtnexus.models.UpdateRideStatusResponse;
 import com.octosync.bubtnexus.network.ApiClient;
 import com.octosync.bubtnexus.network.ApiService;
 import com.octosync.bubtnexus.utils.SessionManager;
@@ -57,6 +59,13 @@ public class RideDetailsActivity extends AppCompatActivity {
     private int rideId;
     private Ride ride;
     private int currentUserId;
+
+    // Status action views
+    private MaterialCardView cardStatusActions;
+    private com.google.android.material.button.MaterialButton btnStartRide;
+    private com.google.android.material.button.MaterialButton btnCompleteRide;
+    private com.google.android.material.button.MaterialButton btnCancelRide;
+    private TextView tvStatusMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +123,13 @@ public class RideDetailsActivity extends AppCompatActivity {
         tvDistance = findViewById(R.id.tvDistance);
         tvStatus = findViewById(R.id.tvStatus);
         tvNotes = findViewById(R.id.tvNotes);
+
+        // Status action views
+        cardStatusActions = findViewById(R.id.cardStatusActions);
+        btnStartRide = findViewById(R.id.btnStartRide);
+        btnCompleteRide = findViewById(R.id.btnCompleteRide);
+        btnCancelRide = findViewById(R.id.btnCancelRide);
+        tvStatusMessage = findViewById(R.id.tvStatusMessage);
 
         // Other views
         progressBar = findViewById(R.id.progressBar);
@@ -181,6 +197,231 @@ public class RideDetailsActivity extends AppCompatActivity {
         });
     }
 
+    private void setupStatusActions() {
+        // Show status actions only for the ride creator (driver)
+        if (ride.getDriverId() != currentUserId) {
+            cardStatusActions.setVisibility(View.GONE);
+            return;
+        }
+
+        cardStatusActions.setVisibility(View.VISIBLE);
+
+        // Reset all buttons
+        btnStartRide.setVisibility(View.GONE);
+        btnCompleteRide.setVisibility(View.GONE);
+        btnCancelRide.setVisibility(View.GONE);
+        tvStatusMessage.setVisibility(View.GONE);
+
+        String currentStatus = ride.getStatus().toLowerCase();
+
+        // Show appropriate buttons based on current status
+        switch (currentStatus) {
+            case "pending":
+                // For pending rides, show Start Ride and Cancel buttons
+                btnStartRide.setVisibility(View.VISIBLE);
+                btnCancelRide.setVisibility(View.VISIBLE);
+                break;
+
+            case "active":
+                // For active rides, show Complete Ride and Cancel buttons
+                btnCompleteRide.setVisibility(View.VISIBLE);
+                btnCancelRide.setVisibility(View.VISIBLE);
+                break;
+
+            case "completed":
+            case "cancelled":
+                // For completed/cancelled rides, show only message
+                tvStatusMessage.setText(String.format("This ride has been %s", currentStatus));
+                tvStatusMessage.setVisibility(View.VISIBLE);
+                break;
+
+            default:
+                cardStatusActions.setVisibility(View.GONE);
+                return;
+        }
+
+        // Setup click listeners
+        btnStartRide.setOnClickListener(v -> {
+            showConfirmStatusDialog("Start Ride",
+                    "Are you sure you want to start this ride? This will change the status to ACTIVE.",
+                    "active");
+        });
+
+        btnCompleteRide.setOnClickListener(v -> {
+            showConfirmStatusDialog("Complete Ride",
+                    "Are you sure you want to complete this ride? This will mark the ride as COMPLETED.",
+                    "completed");
+        });
+
+        btnCancelRide.setOnClickListener(v -> {
+            showConfirmStatusDialog("Cancel Ride",
+                    "Are you sure you want to cancel this ride? This action cannot be undone.",
+                    "cancelled");
+        });
+    }
+
+    private void showConfirmStatusDialog(String title, String message, final String newStatus) {
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Confirm", (dialog, which) -> {
+                    updateRideStatus(newStatus);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void updateRideStatus(String newStatus) {
+        showLoading(true);
+
+        String token = sessionManager.getToken();
+        if (token == null) {
+            showToast("Please login again");
+            redirectToLogin();
+            return;
+        }
+
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+
+        UpdateRideStatusRequest updateRequest = new UpdateRideStatusRequest(newStatus);
+        Call<UpdateRideStatusResponse> call = apiService.updateRideStatus(
+                "Bearer " + token,
+                rideId,
+                updateRequest
+        );
+
+        call.enqueue(new Callback<UpdateRideStatusResponse>() {
+            @Override
+            public void onResponse(Call<UpdateRideStatusResponse> call,
+                                   Response<UpdateRideStatusResponse> response) {
+                showLoading(false);
+
+                if (response.isSuccessful() && response.body() != null) {
+                    UpdateRideStatusResponse statusResponse = response.body();
+
+                    if (statusResponse.isSuccess()) {
+                        showToast(statusResponse.getMessage());
+
+                        // Update the ride object with new data
+                        if (statusResponse.getData() != null) {
+                            ride = statusResponse.getData();
+                            // Update the UI with new data
+                            updateUIWithNewRideData(ride);
+                            setupStatusActions(); // Re-setup status buttons
+                            setupPassengerRequests(); // Re-setup passenger requests
+                        }
+                    } else {
+                        showToast("Failed: " + statusResponse.getMessage());
+                    }
+                } else {
+                    // Handle different error cases
+                    if (response.code() == 403) {
+                        showToast("You don't have permission to update this ride status.");
+                    } else if (response.code() == 400) {
+                        showToast("Invalid status update. Please try again.");
+                    } else if (response.code() == 404) {
+                        showToast("Ride not found.");
+                    } else {
+                        showToast("Failed to update ride status. Code: " + response.code());
+                    }
+                    // Even on error, make sure content is visible
+                    if (ride != null) {
+                        showRideDetails();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UpdateRideStatusResponse> call, Throwable t) {
+                showLoading(false);
+                showToast("Network error: " + t.getMessage());
+                // Make sure content is visible even on failure
+                if (ride != null) {
+                    showRideDetails();
+                }
+            }
+        });
+    }
+
+    private void updateUIWithNewRideData(Ride updatedRide) {
+        // Update all UI elements with new ride data
+        tvTitle.setText(String.format("Ride to %s", updatedRide.getToLocation()));
+
+        // Driver info
+        if (updatedRide.getDriver() != null) {
+            tvDriverName.setText(updatedRide.getDriver().getName());
+            tvDriverStatus.setText(updatedRide.getDriver().getStatus());
+            if ("active".equalsIgnoreCase(updatedRide.getDriver().getStatus())) {
+                tvDriverStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+            } else {
+                tvDriverStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            }
+        }
+
+        // Route
+        tvFromLocation.setText(updatedRide.getFromLocation());
+        tvToLocation.setText(updatedRide.getToLocation());
+
+        // Format departure time
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault());
+            Date date = inputFormat.parse(updatedRide.getDepartureTime());
+            tvDepartureTime.setText(outputFormat.format(date));
+        } catch (ParseException e) {
+            tvDepartureTime.setText(updatedRide.getDepartureTime());
+        }
+
+        // Ride info
+        tvAvailableSeats.setText(String.format(Locale.getDefault(), "%d seats", updatedRide.getAvailableSeats()));
+        tvFare.setText(String.format("৳%s", updatedRide.getFarePerSeat()));
+
+        if (updatedRide.getVehicleType() != null) {
+            tvVehicleType.setText(updatedRide.getVehicleType());
+        }
+
+        if (updatedRide.getVehicleNumber() != null) {
+            tvVehicleNumber.setText(updatedRide.getVehicleNumber());
+        }
+
+        tvDistance.setText(String.format(Locale.getDefault(), "%.1f km", updatedRide.getDistance()));
+        tvStatus.setText(updatedRide.getStatus());
+
+        // Set status color
+        updateStatusColor(updatedRide.getStatus());
+
+        // Notes
+        if (updatedRide.getNotes() != null && !updatedRide.getNotes().isEmpty()) {
+            tvNotes.setText(updatedRide.getNotes());
+            cardNotes.setVisibility(View.VISIBLE);
+        } else {
+            cardNotes.setVisibility(View.GONE);
+        }
+
+        // Make sure content is visible
+        llContent.setVisibility(View.VISIBLE);
+        tvError.setVisibility(View.GONE);
+    }
+    private void updateStatusColor(String status) {
+        String statusLower = status.toLowerCase();
+        switch (statusLower) {
+            case "active":
+                tvStatus.setTextColor(getResources().getColor(R.color.success_color));
+                break;
+            case "completed":
+                tvStatus.setTextColor(getResources().getColor(R.color.info_color));
+                break;
+            case "cancelled":
+                tvStatus.setTextColor(getResources().getColor(R.color.error_color));
+                break;
+            case "pending":
+                tvStatus.setTextColor(getResources().getColor(R.color.warning_color));
+                break;
+            default:
+                tvStatus.setTextColor(getResources().getColor(android.R.color.black));
+        }
+    }
+
     private void showRideDetails() {
         llContent.setVisibility(View.VISIBLE);
         tvError.setVisibility(View.GONE);
@@ -241,6 +482,7 @@ public class RideDetailsActivity extends AppCompatActivity {
             tvNotes.setText(ride.getNotes());
             cardNotes.setVisibility(View.VISIBLE);
         }
+        setupStatusActions();
     }
 
     private void setupPassengerRequests() {

@@ -35,7 +35,7 @@
             android:alpha="0.8"
             android:fontFamily="sans-serif"
             android:text="Monday, 15 January"
-            android:textColor="@color/white"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="14sp" />
 
         <!-- User Info (Student ID/Faculty Info) -->
@@ -48,7 +48,7 @@
             android:alpha="0.9"
             android:fontFamily="sans-serif"
             android:text=""
-            android:textColor="@color/white"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="12sp"
             android:visibility="gone" />
 
@@ -75,7 +75,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="@color/card_background"
                 app:cardCornerRadius="32dp"
                 app:cardElevation="8dp">
 
@@ -97,7 +97,7 @@
                         app:boxCornerRadiusTopEnd="24dp"
                         app:boxCornerRadiusTopStart="24dp"
                         app:startIconDrawable="@android:drawable/ic_menu_search"
-                        app:startIconTint="@color/text_hint">
+                        app:startIconTint="?attr/colorOnSurfaceVariant">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etSearch"
@@ -105,6 +105,8 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif"
                             android:hint="Search courses, assignments..."
+                            android:textColor="?attr/colorOnSurface"
+                            android:textColorHint="?attr/colorOnSurfaceVariant"
                             android:textSize="16sp" />
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -118,7 +120,7 @@
                         android:layout_marginBottom="16dp"
                         android:fontFamily="sans-serif-medium"
                         android:text="Quick Access"
-                        android:textColor="@color/text_primary"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:visibility="visible" />
@@ -146,7 +148,7 @@
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
                                 android:src="@drawable/ic_calendar"
-                                app:tint="@color/primary_color" />
+                                app:tint="?attr/colorPrimary" />
 
                             <TextView
                                 android:id="@android:id/text1"
@@ -169,7 +171,7 @@
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
                                 android:src="@drawable/library_books"
-                                app:tint="@color/primary_color" />
+                                app:tint="?attr/colorPrimary" />
 
                             <TextView
                                 android:id="@android:id/text1"
@@ -192,7 +194,7 @@
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
                                 android:src="@drawable/ic_notifications"
-                                app:tint="@color/primary_color" />
+                                app:tint="?attr/colorPrimary" />
 
                             <TextView
                                 android:id="@android:id/text1"
@@ -215,7 +217,7 @@
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
                                 android:src="@drawable/ic_people"
-                                app:tint="@color/primary_color" />
+                                app:tint="?attr/colorPrimary" />
 
                             <TextView
                                 android:id="@android:id/text1"
@@ -238,7 +240,7 @@
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
                                 android:src="@drawable/ic_event"
-                                app:tint="@color/primary_color" />
+                                app:tint="?attr/colorPrimary" />
 
                             <TextView
                                 android:id="@android:id/text1"
@@ -261,7 +263,7 @@
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
                                 android:src="@drawable/ic_bike"
-                                app:tint="@color/primary_color" />
+                                app:tint="?attr/colorPrimary" />
 
                             <TextView
                                 android:id="@android:id/text1"
@@ -288,7 +290,7 @@
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="?attr/colorSurface"
         app:itemIconTint="@color/nav_color_state"
         app:itemTextColor="@color/nav_color_state"
         app:labelVisibilityMode="labeled"

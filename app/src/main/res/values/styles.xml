@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Base App Theme -->
-    <style name="AppTheme" parent="Theme.Material3.Light.NoActionBar">
-        <item name="colorPrimary">@color/primary_color</item>
-        <item name="colorPrimaryVariant">@color/primary_dark</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="colorSecondary">@color/secondary_color</item>
-        <item name="colorSecondaryVariant">@color/secondary_dark</item>
+    <style name="AppTheme" parent="Theme.BUBTNexus">
+        <!-- Inherits everything from Theme.BUBTNexus -->
     </style>
 
     <!-- Grid Button Style -->
@@ -24,38 +20,30 @@
         <item name="android:stateListAnimator">@null</item>
     </style>
 
-    <!-- Grid Button Text Style -->
+    <!-- Grid Button Text Style for Dark Theme -->
     <style name="GridButtonText">
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColor">@color/text_primary
+        </item> <!-- This will use dark theme text color -->
         <item name="android:textStyle">normal</item>
         <item name="android:gravity">center</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-    <!-- Welcome Text Style -->
+    <!-- Welcome Text Style for Dark Theme -->
     <style name="WelcomeText">
         <item name="android:textSize">26sp</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:letterSpacing">0.02</item>
     </style>
 
-    <!-- Search Bar Style -->
-    <style name="SearchEditText">
-        <item name="android:background">@drawable/search_background</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textColorHint">@color/text_hint</item>
-        <item name="android:fontFamily">sans-serif</item>
-    </style>
-
+    <!-- TextInputLayout Style -->
     <style name="TextInputLayoutStyle" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxCornerRadiusBottomEnd">12dp</item>
         <item name="boxCornerRadiusBottomStart">12dp</item>
         <item name="boxCornerRadiusTopEnd">12dp</item>
         <item name="boxCornerRadiusTopStart">12dp</item>
     </style>
-
 </resources>

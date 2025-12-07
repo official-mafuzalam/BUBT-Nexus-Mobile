@@ -5,56 +5,56 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
+    app:cardBackgroundColor="?attr/colorSurface"
     app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
-    app:cardBackgroundColor="@color/white">
+    app:cardElevation="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/colorSurfaceVariant"
         android:orientation="horizontal"
-        android:padding="16dp"
-        android:background="@drawable/class_item_background">
+        android:padding="16dp">
 
         <!-- Time Section -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:gravity="center"
+            android:orientation="vertical"
             android:paddingEnd="16dp">
 
             <TextView
                 android:id="@+id/tvTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
                 android:text="10:30 AM"
-                android:textColor="@color/primary_color"
+                android:textColor="?attr/colorPrimary"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"
                 tools:ignore="HardcodedText" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="to"
-                android:textColor="@color/text_secondary"
-                android:textSize="10sp"
-                android:fontFamily="sans-serif"
                 android:layout_marginTop="2dp"
                 android:layout_marginBottom="2dp"
+                android:fontFamily="sans-serif"
+                android:text="to"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="10sp"
                 tools:ignore="HardcodedText" />
 
             <TextView
                 android:id="@+id/tvEndTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
                 android:text="11:45 AM"
-                android:textColor="@color/primary_color"
+                android:textColor="?attr/colorPrimary"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"
                 tools:ignore="HardcodedText" />
 
         </LinearLayout>
@@ -63,8 +63,8 @@
         <View
             android:layout_width="1dp"
             android:layout_height="40dp"
-            android:background="@color/divider_color"
-            android:layout_marginEnd="16dp" />
+            android:layout_marginEnd="16dp"
+            android:background="?attr/colorOutline" />
 
         <!-- Class Details -->
         <LinearLayout
@@ -77,41 +77,41 @@
                 android:id="@+id/tvCourseCode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
                 android:text="ENG 1101"
-                android:textColor="@color/text_primary"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"
                 tools:ignore="HardcodedText" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="4dp">
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tvFaculty"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="SMAA"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
                     android:fontFamily="sans-serif"
+                    android:text="SMAA"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="12sp"
                     tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/tvRoom"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Room 4701"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
+                    android:background="?attr/colorPrimaryContainer"
                     android:fontFamily="sans-serif"
-                    android:background="@drawable/room_badge"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="2dp"
+                    android:text="Room 4701"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="12sp"
                     tools:ignore="HardcodedText" />
 
             </LinearLayout>
