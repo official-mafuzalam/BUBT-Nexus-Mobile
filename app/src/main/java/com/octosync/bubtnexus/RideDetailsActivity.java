@@ -173,12 +173,18 @@ public class RideDetailsActivity extends AppCompatActivity {
                 showLoading(false);
 
                 if (response.isSuccessful() && response.body() != null) {
-                    ride = response.body().getRide();
-                    if (ride != null) {
-                        showRideDetails();
-                        setupPassengerRequests();
+                    RideDetailsResponse rideDetailsResponse = response.body();
+
+                    // Check if response status is "success"
+                    if ("success".equalsIgnoreCase(rideDetailsResponse.getStatus())) {
+                        ride = rideDetailsResponse.getRide();
+                        if (ride != null) {
+                            updateUIWithRideData(ride);
+                        } else {
+                            showError("Failed to load ride details");
+                        }
                     } else {
-                        showError("Failed to load ride details");
+                        showError("Failed to load ride details. Status: " + rideDetailsResponse.getStatus());
                     }
                 } else {
                     if (response.code() == 404) {
@@ -197,7 +203,73 @@ public class RideDetailsActivity extends AppCompatActivity {
         });
     }
 
-    private void setupStatusActions() {
+    private void updateUIWithRideData(Ride ride) {
+        runOnUiThread(() -> {
+            llContent.setVisibility(View.VISIBLE);
+            tvError.setVisibility(View.GONE);
+
+            // Set ride details
+            tvTitle.setText(String.format("Ride to %s", ride.getToLocation()));
+
+            // Driver info
+            if (ride.getDriver() != null) {
+                tvDriverName.setText(ride.getDriver().getName());
+                tvDriverStatus.setText(ride.getDriver().getStatus());
+                // Set status color
+                if ("active".equalsIgnoreCase(ride.getDriver().getStatus())) {
+                    tvDriverStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                } else {
+                    tvDriverStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                }
+            }
+
+            // Route
+            tvFromLocation.setText(ride.getFromLocation());
+            tvToLocation.setText(ride.getToLocation());
+
+            // Format departure time
+            try {
+                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());
+                SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault());
+                Date date = inputFormat.parse(ride.getDepartureTime());
+                tvDepartureTime.setText(outputFormat.format(date));
+            } catch (ParseException e) {
+                tvDepartureTime.setText(ride.getDepartureTime());
+            }
+
+            // Ride info
+            tvAvailableSeats.setText(String.format(Locale.getDefault(), "%d seats", ride.getAvailableSeats()));
+            tvFare.setText(String.format("৳%s", ride.getFarePerSeat()));
+
+            if (ride.getVehicleType() != null) {
+                tvVehicleType.setText(ride.getVehicleType());
+            }
+
+            if (ride.getVehicleNumber() != null) {
+                tvVehicleNumber.setText(ride.getVehicleNumber());
+            }
+
+            tvDistance.setText(String.format(Locale.getDefault(), "%.1f km", ride.getDistance()));
+            tvStatus.setText(ride.getStatus());
+
+            // Set status color
+            updateStatusColor(ride.getStatus());
+
+            // Notes
+            if (ride.getNotes() != null && !ride.getNotes().isEmpty()) {
+                tvNotes.setText(ride.getNotes());
+                cardNotes.setVisibility(View.VISIBLE);
+            } else {
+                cardNotes.setVisibility(View.GONE);
+            }
+
+            // Setup status actions and passenger requests
+            setupStatusActions(ride);
+            setupPassengerRequests(ride);
+        });
+    }
+
+    private void setupStatusActions(Ride ride) {
         // Show status actions only for the ride creator (driver)
         if (ride.getDriverId() != currentUserId) {
             cardStatusActions.setVisibility(View.GONE);
@@ -217,20 +289,17 @@ public class RideDetailsActivity extends AppCompatActivity {
         // Show appropriate buttons based on current status
         switch (currentStatus) {
             case "pending":
-                // For pending rides, show Start Ride and Cancel buttons
                 btnStartRide.setVisibility(View.VISIBLE);
                 btnCancelRide.setVisibility(View.VISIBLE);
                 break;
 
             case "active":
-                // For active rides, show Complete Ride and Cancel buttons
                 btnCompleteRide.setVisibility(View.VISIBLE);
                 btnCancelRide.setVisibility(View.VISIBLE);
                 break;
 
             case "completed":
             case "cancelled":
-                // For completed/cancelled rides, show only message
                 tvStatusMessage.setText(String.format("This ride has been %s", currentStatus));
                 tvStatusMessage.setVisibility(View.VISIBLE);
                 break;
@@ -239,6 +308,11 @@ public class RideDetailsActivity extends AppCompatActivity {
                 cardStatusActions.setVisibility(View.GONE);
                 return;
         }
+
+        // Clear existing listeners before setting new ones
+        btnStartRide.setOnClickListener(null);
+        btnCompleteRide.setOnClickListener(null);
+        btnCancelRide.setOnClickListener(null);
 
         // Setup click listeners
         btnStartRide.setOnClickListener(v -> {
@@ -299,16 +373,21 @@ public class RideDetailsActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     UpdateRideStatusResponse statusResponse = response.body();
 
-                    if (statusResponse.isSuccess()) {
+                    // Check response status using the new isSuccess() method or directly
+                    if (statusResponse.isSuccess()) { // or use: "success".equalsIgnoreCase(statusResponse.getStatus())
                         showToast(statusResponse.getMessage());
 
                         // Update the ride object with new data
                         if (statusResponse.getData() != null) {
                             ride = statusResponse.getData();
-                            // Update the UI with new data
-                            updateUIWithNewRideData(ride);
-                            setupStatusActions(); // Re-setup status buttons
-                            setupPassengerRequests(); // Re-setup passenger requests
+                            // Update UI with the new ride data
+                            updateUIWithRideData(ride);
+
+                            // Show success toast
+                            showToast("Ride status updated successfully!");
+                        } else {
+                            // If no data in response, refresh from server
+                            loadRideDetails();
                         }
                     } else {
                         showToast("Failed: " + statusResponse.getMessage());
@@ -324,9 +403,15 @@ public class RideDetailsActivity extends AppCompatActivity {
                     } else {
                         showToast("Failed to update ride status. Code: " + response.code());
                     }
-                    // Even on error, make sure content is visible
-                    if (ride != null) {
-                        showRideDetails();
+
+                    // Try to get error message from response body
+                    try {
+                        if (response.errorBody() != null) {
+                            String errorBody = response.errorBody().string();
+                            System.out.println("Error response: " + errorBody);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -335,73 +420,10 @@ public class RideDetailsActivity extends AppCompatActivity {
             public void onFailure(Call<UpdateRideStatusResponse> call, Throwable t) {
                 showLoading(false);
                 showToast("Network error: " + t.getMessage());
-                // Make sure content is visible even on failure
-                if (ride != null) {
-                    showRideDetails();
-                }
             }
         });
     }
 
-    private void updateUIWithNewRideData(Ride updatedRide) {
-        // Update all UI elements with new ride data
-        tvTitle.setText(String.format("Ride to %s", updatedRide.getToLocation()));
-
-        // Driver info
-        if (updatedRide.getDriver() != null) {
-            tvDriverName.setText(updatedRide.getDriver().getName());
-            tvDriverStatus.setText(updatedRide.getDriver().getStatus());
-            if ("active".equalsIgnoreCase(updatedRide.getDriver().getStatus())) {
-                tvDriverStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-            } else {
-                tvDriverStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            }
-        }
-
-        // Route
-        tvFromLocation.setText(updatedRide.getFromLocation());
-        tvToLocation.setText(updatedRide.getToLocation());
-
-        // Format departure time
-        try {
-            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());
-            SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault());
-            Date date = inputFormat.parse(updatedRide.getDepartureTime());
-            tvDepartureTime.setText(outputFormat.format(date));
-        } catch (ParseException e) {
-            tvDepartureTime.setText(updatedRide.getDepartureTime());
-        }
-
-        // Ride info
-        tvAvailableSeats.setText(String.format(Locale.getDefault(), "%d seats", updatedRide.getAvailableSeats()));
-        tvFare.setText(String.format("৳%s", updatedRide.getFarePerSeat()));
-
-        if (updatedRide.getVehicleType() != null) {
-            tvVehicleType.setText(updatedRide.getVehicleType());
-        }
-
-        if (updatedRide.getVehicleNumber() != null) {
-            tvVehicleNumber.setText(updatedRide.getVehicleNumber());
-        }
-
-        tvDistance.setText(String.format(Locale.getDefault(), "%.1f km", updatedRide.getDistance()));
-        tvStatus.setText(updatedRide.getStatus());
-
-        // Set status color
-        updateStatusColor(updatedRide.getStatus());
-
-        // Notes
-        if (updatedRide.getNotes() != null && !updatedRide.getNotes().isEmpty()) {
-            tvNotes.setText(updatedRide.getNotes());
-            cardNotes.setVisibility(View.VISIBLE);
-        } else {
-            cardNotes.setVisibility(View.GONE);
-        }
-
-        // Make sure content is visible
-        llContent.setVisibility(View.VISIBLE);
-        tvError.setVisibility(View.GONE);
-    }
     private void updateStatusColor(String status) {
         String statusLower = status.toLowerCase();
         switch (statusLower) {
@@ -422,70 +444,7 @@ public class RideDetailsActivity extends AppCompatActivity {
         }
     }
 
-    private void showRideDetails() {
-        llContent.setVisibility(View.VISIBLE);
-        tvError.setVisibility(View.GONE);
-
-        // Set ride details
-        tvTitle.setText(String.format("Ride to %s", ride.getToLocation()));
-
-        // Driver info
-        if (ride.getDriver() != null) {
-            tvDriverName.setText(ride.getDriver().getName());
-            tvDriverStatus.setText(ride.getDriver().getStatus());
-            // Set status color
-            if ("active".equalsIgnoreCase(ride.getDriver().getStatus())) {
-                tvDriverStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-            } else {
-                tvDriverStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            }
-        }
-
-        // Route
-        tvFromLocation.setText(ride.getFromLocation());
-        tvToLocation.setText(ride.getToLocation());
-
-        // Format departure time
-        try {
-            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());
-            SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault());
-            Date date = inputFormat.parse(ride.getDepartureTime());
-            tvDepartureTime.setText(outputFormat.format(date));
-        } catch (ParseException e) {
-            tvDepartureTime.setText(ride.getDepartureTime());
-        }
-
-        // Ride info
-        tvAvailableSeats.setText(String.format(Locale.getDefault(), "%d seats", ride.getAvailableSeats()));
-        tvFare.setText(String.format("৳%s", ride.getFarePerSeat()));
-
-        if (ride.getVehicleType() != null) {
-            tvVehicleType.setText(ride.getVehicleType());
-        }
-
-        if (ride.getVehicleNumber() != null) {
-            tvVehicleNumber.setText(ride.getVehicleNumber());
-        }
-
-        tvDistance.setText(String.format(Locale.getDefault(), "%.1f km", ride.getDistance()));
-        tvStatus.setText(ride.getStatus());
-
-        // Set status color
-        if ("active".equalsIgnoreCase(ride.getStatus())) {
-            tvStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-        } else {
-            tvStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-        }
-
-        // Notes
-        if (ride.getNotes() != null && !ride.getNotes().isEmpty()) {
-            tvNotes.setText(ride.getNotes());
-            cardNotes.setVisibility(View.VISIBLE);
-        }
-        setupStatusActions();
-    }
-
-    private void setupPassengerRequests() {
+    private void setupPassengerRequests(Ride ride) {
         // Show passenger requests section only for the ride creator
         if (ride.getDriverId() != currentUserId) {
             cardPassengerRequests.setVisibility(View.GONE);
@@ -683,9 +642,16 @@ public class RideDetailsActivity extends AppCompatActivity {
                 showLoading(false);
 
                 if (response.isSuccessful() && response.body() != null) {
-                    showToast(response.body().getMessage());
-                    // Refresh ride details
-                    loadRideDetails();
+                    PassengerRequestResponse passengerResponse = response.body();
+
+                    // Check response status
+                    if ("success".equalsIgnoreCase(passengerResponse.getStatus())) {
+                        showToast(passengerResponse.getMessage());
+                        // Refresh ride details to get updated data
+                        loadRideDetails();
+                    } else {
+                        showToast("Failed: " + passengerResponse.getMessage());
+                    }
                 } else {
                     // Handle different error cases
                     if (response.code() == 404) {
@@ -697,17 +663,6 @@ public class RideDetailsActivity extends AppCompatActivity {
                     } else {
                         showToast("Failed to update request status. Code: " + response.code());
                     }
-
-                    // Try to get error message from response body
-                    try {
-                        if (response.errorBody() != null) {
-                            String errorBody = response.errorBody().string();
-                            // Log the error for debugging
-                            System.out.println("Error response: " + errorBody);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
                 }
             }
 
@@ -715,7 +670,6 @@ public class RideDetailsActivity extends AppCompatActivity {
             public void onFailure(Call<PassengerRequestResponse> call, Throwable t) {
                 showLoading(false);
                 showToast("Network error: " + t.getMessage());
-                t.printStackTrace();
             }
         });
     }

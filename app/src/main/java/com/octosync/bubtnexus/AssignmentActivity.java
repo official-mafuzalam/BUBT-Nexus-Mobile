@@ -20,7 +20,6 @@ public class AssignmentActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView tvError;
     private ImageButton btnBack;
-    private BottomNavigationView bottomNavigation;
 
     // Session
     private SessionManager sessionManager;
@@ -41,7 +40,6 @@ public class AssignmentActivity extends AppCompatActivity {
 
         initializeViews();
         setupClickListeners();
-        setupBottomNavigation();
         loadAssignmentData();
     }
 
@@ -60,35 +58,12 @@ public class AssignmentActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         tvError = findViewById(R.id.tvError);
         btnBack = findViewById(R.id.btnBack);
-        bottomNavigation = findViewById(R.id.bottomNavigation);
     }
 
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
     }
 
-    private void setupBottomNavigation() {
-        // Set appropriate navigation item as selected
-        bottomNavigation.setSelectedItemId(R.id.nav_home);
-
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                navigateToMainActivity();
-                return true;
-            } else if (id == R.id.nav_task) {
-                navigateToTaskActivity();
-                return true;
-            } else if (id == R.id.nav_profile) {
-                navigateToProfileActivity();
-                return true;
-            } else if (id == R.id.nav_logout) {
-                logoutUser();
-                return true;
-            }
-            return false;
-        });
-    }
 
     private void navigateToMainActivity() {
         Intent intent = new Intent(AssignmentActivity.this, MainActivity.class);

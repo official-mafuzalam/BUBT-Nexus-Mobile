@@ -1,74 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primary_color"
+    android:orientation="vertical"
     tools:context=".RideCreateActivity">
 
-    <!-- Header -->
+    <!-- Header Section -->
     <LinearLayout
-        android:id="@+id/header"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
+        android:orientation="vertical"
         android:paddingTop="32dp"
-        android:paddingBottom="16dp"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:paddingBottom="16dp">
 
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_arrow_back"
-            app:tint="@color/white" />
-
-        <TextView
-            android:layout_width="0dp"
+        <!-- Back Button and Title -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="16dp"
-            android:gravity="center"
-            android:text="Create New Ride"
-            android:textColor="@color/white"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-medium" />
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <ImageButton
-            android:id="@+id/btnSave"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_check"
-            app:tint="@color/white" />
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="?attr/colorOnPrimary" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:text="Create New Ride"
+                android:textColor="?attr/colorOnPrimary"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
     <!-- Content Card -->
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardContent"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header">
+        android:layout_weight="1"
+        app:cardBackgroundColor="?attr/cardBackgroundColor"
+        app:cardCornerRadius="32dp"
+        app:cardElevation="8dp">
 
         <!-- Scrollable form -->
         <ScrollView
@@ -85,45 +75,47 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="16dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="From Location *"
-                        android:textColor="@color/text_primary"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp" />
+                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
                         <EditText
                             android:id="@+id/etFromLocation"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:background="@drawable/edittext_background"
+                            android:clickable="true"
+                            android:focusable="false"
                             android:hint="Tap to select location"
                             android:inputType="text"
                             android:maxLines="1"
                             android:padding="12dp"
-                            android:background="@drawable/edittext_background"
-                            android:focusable="false"
-                            android:clickable="true" />
+                            android:textColor="?attr/colorOnSurface"
+                            android:textColorHint="?attr/colorOnSurfaceVariant" />
 
                         <ImageButton
                             android:id="@+id/btnFromMap"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:layout_marginStart="8dp"
-                            android:src="@drawable/ic_location"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            app:tint="@color/primary_color" />
+                            android:src="@drawable/ic_location"
+                            app:tint="?attr/colorPrimary" />
 
                     </LinearLayout>
 
@@ -133,45 +125,47 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="16dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="To Location *"
-                        android:textColor="@color/text_primary"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp" />
+                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
                         <EditText
                             android:id="@+id/etToLocation"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:background="@drawable/edittext_background"
+                            android:clickable="true"
+                            android:focusable="false"
                             android:hint="Tap to select location"
                             android:inputType="text"
                             android:maxLines="1"
                             android:padding="12dp"
-                            android:background="@drawable/edittext_background"
-                            android:focusable="false"
-                            android:clickable="true" />
+                            android:textColor="?attr/colorOnSurface"
+                            android:textColorHint="?attr/colorOnSurfaceVariant" />
 
                         <ImageButton
                             android:id="@+id/btnToMap"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:layout_marginStart="8dp"
-                            android:src="@drawable/ic_location"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            app:tint="@color/primary_color" />
+                            android:src="@drawable/ic_location"
+                            app:tint="?attr/colorPrimary" />
 
                     </LinearLayout>
 
@@ -210,35 +204,37 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="16dp"
+                    android:orientation="horizontal">
 
                     <!-- Total Seats -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginEnd="8dp">
+                        android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
                             android:text="Total Seats *"
-                            android:textColor="@color/text_primary"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="4dp" />
+                            android:textStyle="bold" />
 
                         <EditText
                             android:id="@+id/etTotalSeats"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="@drawable/edittext_background"
                             android:hint="4"
                             android:inputType="number"
                             android:maxLines="1"
                             android:padding="12dp"
-                            android:background="@drawable/edittext_background" />
+                            android:textColor="?attr/colorOnSurface"
+                            android:textColorHint="?attr/colorOnSurfaceVariant" />
 
                     </LinearLayout>
 
@@ -246,28 +242,30 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="8dp">
+                        android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
                             android:text="Fare per Seat (৳) *"
-                            android:textColor="@color/text_primary"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="4dp" />
+                            android:textStyle="bold" />
 
                         <EditText
                             android:id="@+id/etFarePerSeat"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="@drawable/edittext_background"
                             android:hint="50.0"
                             android:inputType="numberDecimal"
                             android:maxLines="1"
                             android:padding="12dp"
-                            android:background="@drawable/edittext_background" />
+                            android:textColor="?attr/colorOnSurface"
+                            android:textColorHint="?attr/colorOnSurfaceVariant" />
 
                     </LinearLayout>
 
@@ -277,26 +275,26 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="16dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Departure Time *"
-                        android:textColor="@color/text_primary"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp" />
+                        android:textStyle="bold" />
 
                     <Button
                         android:id="@+id/btnDepartureTime"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Select Date and Time"
-                        android:textColor="@color/text_primary"
                         android:background="@drawable/edittext_background"
-                        android:padding="12dp" />
+                        android:padding="12dp"
+                        android:text="Select Date and Time"
+                        android:textColor="?attr/colorOnSurface" />
 
                     <TextView
                         android:id="@+id/tvDepartureTime"
@@ -304,7 +302,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Not selected"
-                        android:textColor="@color/text_secondary"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -313,35 +311,37 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="16dp"
+                    android:orientation="horizontal">
 
                     <!-- Vehicle Type -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginEnd="8dp">
+                        android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
                             android:text="Vehicle Type"
-                            android:textColor="@color/text_primary"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="4dp" />
+                            android:textStyle="bold" />
 
                         <EditText
                             android:id="@+id/etVehicleType"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="@drawable/edittext_background"
                             android:hint="Car, Bike, etc."
                             android:inputType="text"
                             android:maxLines="1"
                             android:padding="12dp"
-                            android:background="@drawable/edittext_background" />
+                            android:textColor="?attr/colorOnSurface"
+                            android:textColorHint="?attr/colorOnSurfaceVariant" />
 
                     </LinearLayout>
 
@@ -349,28 +349,30 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="8dp">
+                        android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
                             android:text="Vehicle Number"
-                            android:textColor="@color/text_primary"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="4dp" />
+                            android:textStyle="bold" />
 
                         <EditText
                             android:id="@+id/etVehicleNumber"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="@drawable/edittext_background"
                             android:hint="DHA-12345"
                             android:inputType="text"
                             android:maxLines="1"
                             android:padding="12dp"
-                            android:background="@drawable/edittext_background" />
+                            android:textColor="?attr/colorOnSurface"
+                            android:textColorHint="?attr/colorOnSurfaceVariant" />
 
                     </LinearLayout>
 
@@ -380,29 +382,70 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="24dp">
+                    android:layout_marginBottom="24dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Notes (Optional)"
-                        android:textColor="@color/text_primary"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp" />
+                        android:textStyle="bold" />
 
                     <EditText
                         android:id="@+id/etNotes"
                         android:layout_width="match_parent"
                         android:layout_height="100dp"
+                        android:background="@drawable/edittext_background"
+                        android:gravity="top"
                         android:hint="Any additional information..."
                         android:inputType="textMultiLine"
-                        android:gravity="top"
                         android:padding="12dp"
-                        android:background="@drawable/edittext_background" />
+                        android:textColor="?attr/colorOnSurface"
+                        android:textColorHint="?attr/colorOnSurfaceVariant" />
 
                 </LinearLayout>
+
+                <!-- Create Ride Button -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/btnCreate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="24dp"
+                    app:cardBackgroundColor="?attr/colorPrimary"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="12dp"
+                            android:src="@drawable/ic_check"
+                            app:tint="?attr/colorOnPrimary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Create Ride"
+                            android:textColor="?attr/colorOnPrimary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
 
                 <!-- Progress Bar -->
                 <ProgressBar
@@ -418,7 +461,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:textColor="@color/red"
+                    android:textColor="?attr/colorError"
                     android:textSize="14sp"
                     android:visibility="gone" />
 
@@ -428,4 +471,4 @@
 
     </androidx.cardview.widget.CardView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

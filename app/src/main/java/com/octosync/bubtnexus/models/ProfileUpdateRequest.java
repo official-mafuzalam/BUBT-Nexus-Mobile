@@ -24,6 +24,9 @@ public class ProfileUpdateRequest {
     @SerializedName("intake")
     private String intake;
 
+    @SerializedName("section")
+    private String section;
+
     @SerializedName("cgpa")
     private String cgpa;
 
@@ -61,6 +64,10 @@ public class ProfileUpdateRequest {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getSection() {
+        return section;
     }
 
     public String getStudentId() {
@@ -133,5 +140,9 @@ public class ProfileUpdateRequest {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public void setSection(String section) {
+        this.section = section;
     }
 }

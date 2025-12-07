@@ -37,7 +37,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private static final String TAG = "EditProfileActivity";
     private static final int PICK_IMAGE_REQUEST = 1;
 
-    private EditText etName, etEmail, etPhone, etStudentId, etFacultyCode, etDepartment, etSemester, etIntake, etAddress, etDesignation, etCgpa;
+    private EditText etName, etEmail, etPhone, etSection, etFacultyCode, etDepartment, etSemester, etIntake, etDesignation, etCgpa;
     private ImageView ivProfile;
     private MaterialButton btnSave, btnCancel;
     private ImageButton btnBack;
@@ -67,12 +67,11 @@ public class EditProfileActivity extends AppCompatActivity {
         etName = findViewById(R.id.etName);
         etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
-        etStudentId = findViewById(R.id.etStudentId);
+        etSection = findViewById(R.id.etSection);
         etFacultyCode = findViewById(R.id.etFacultyCode);
         etDepartment = findViewById(R.id.etDepartment);
-        etSemester = findViewById(R.id.etSemester);
+//        etSemester = findViewById(R.id.etSemester);
         etIntake = findViewById(R.id.etIntake);
-        etAddress = findViewById(R.id.etAddress);
         etDesignation = findViewById(R.id.etDesignation);
         etCgpa = findViewById(R.id.etCgpa);
 
@@ -89,18 +88,16 @@ public class EditProfileActivity extends AppCompatActivity {
         boolean isFaculty = sessionManager.isFaculty();
 
         // Find label views
-        View tvStudentIdLabel = findViewById(R.id.tvStudentIdLabel);
         View tvFacultyCodeLabel = findViewById(R.id.tvFacultyCodeLabel);
-        View tvSemesterLabel = findViewById(R.id.tvSemesterLabel);
-        View tvCgpaLabel = findViewById(R.id.tvCgpaLabel);
+//        View tvSemesterLabel = findViewById(R.id.tvSemesterLabel);
         View tvDesignationLabel = findViewById(R.id.tvDesignationLabel);
 
         // Show/hide student fields
-        if (etStudentId != null) {
-            etStudentId.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+        if (etSection != null) {
+            etSection.setVisibility(isStudent ? View.VISIBLE : View.GONE);
         }
-        if (tvStudentIdLabel != null) {
-            tvStudentIdLabel.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+        if (etSection != null) {
+            etSection.setVisibility(isStudent ? View.VISIBLE : View.GONE);
         }
 
         // Show/hide faculty fields
@@ -111,20 +108,22 @@ public class EditProfileActivity extends AppCompatActivity {
             tvFacultyCodeLabel.setVisibility(isFaculty ? View.VISIBLE : View.GONE);
         }
 
+        // Show/hide Department fields
+        if (etDepartment != null) {
+            etDepartment.setVisibility(isFaculty ? View.VISIBLE : View.GONE);
+        }
+
         // Show/hide semester field (for students)
-        if (etSemester != null) {
-            etSemester.setVisibility(isStudent ? View.VISIBLE : View.GONE);
-        }
-        if (tvSemesterLabel != null) {
-            tvSemesterLabel.setVisibility(isStudent ? View.VISIBLE : View.GONE);
-        }
+//        if (etSemester != null) {
+//            etSemester.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+//        }
+//        if (tvSemesterLabel != null) {
+//            tvSemesterLabel.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+//        }
 
         // Show/hide CGPA field (for students)
         if (etCgpa != null) {
             etCgpa.setVisibility(isStudent ? View.VISIBLE : View.GONE);
-        }
-        if (tvCgpaLabel != null) {
-            tvCgpaLabel.setVisibility(isStudent ? View.VISIBLE : View.GONE);
         }
 
         // Show/hide designation field (for faculty)
@@ -151,10 +150,16 @@ public class EditProfileActivity extends AppCompatActivity {
             etPhone.setText(sessionManager.getPhone() != null ? sessionManager.getPhone() : "");
             etDepartment.setText(sessionManager.getDepartment() != null ? sessionManager.getDepartment() : "");
 
+
             // Load user type specific data
             if (sessionManager.isStudent()) {
-                etStudentId.setText(sessionManager.getStudentId() != null ? sessionManager.getStudentId() : "");
-                etSemester.setText(sessionManager.getSemester() != null ? sessionManager.getSemester() : "");
+                String sectionValue = sessionManager.getSection() > 0
+                        ? String.valueOf(sessionManager.getSection())
+                        : "";
+
+                etSection.setText(sectionValue);
+
+//                etSemester.setText(sessionManager.getSemester() != null ? sessionManager.getSemester() : "");
                 etCgpa.setText(sessionManager.getCgpa() != null ? sessionManager.getCgpa() : "");
                 etIntake.setText(sessionManager.getIntake() > 0 ? String.valueOf(sessionManager.getIntake()) : "");
             }
@@ -164,92 +169,14 @@ public class EditProfileActivity extends AppCompatActivity {
                 etDesignation.setText(sessionManager.getDesignation() != null ? sessionManager.getDesignation() : "");
             }
 
-            // Load profile picture from session
-            loadProfilePicture();
         } catch (Exception e) {
             Log.e(TAG, "Error loading user data: " + e.getMessage());
             Toast.makeText(this, "Error loading user data", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void loadProfilePicture() {
-        try {
-            String profilePicturePath = sessionManager.getProfilePicture();
-            if (profilePicturePath != null && !profilePicturePath.isEmpty()) {
-                // Handle Base64 encoded image
-                if (profilePicturePath.startsWith("data:image") || profilePicturePath.startsWith("/9j/")) {
-                    String base64Data = profilePicturePath;
-                    if (profilePicturePath.contains(",")) {
-                        base64Data = profilePicturePath.substring(profilePicturePath.indexOf(",") + 1);
-                    }
-
-                    byte[] decodedBytes = Base64.decode(base64Data, Base64.DEFAULT);
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-                    if (bitmap != null) {
-                        ivProfile.setImageBitmap(bitmap);
-                        selectedBitmap = bitmap;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error loading profile picture: " + e.getMessage());
-        }
-    }
-
     private void openImagePicker() {
-        try {
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            intent.setType("image/*");
-            startActivityForResult(intent, PICK_IMAGE_REQUEST);
-        } catch (Exception e) {
-            Log.e(TAG, "Error opening image picker: " + e.getMessage());
-            Toast.makeText(this, "Cannot open image picker", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
-            selectedImageUri = data.getData();
-            if (selectedImageUri != null) {
-                try {
-                    InputStream inputStream = getContentResolver().openInputStream(selectedImageUri);
-                    if (inputStream != null) {
-                        selectedBitmap = BitmapFactory.decodeStream(inputStream);
-                        inputStream.close();
-
-                        if (selectedBitmap != null) {
-                            // Resize bitmap to avoid memory issues
-                            selectedBitmap = getResizedBitmap(selectedBitmap, 400);
-                            ivProfile.setImageBitmap(selectedBitmap);
-                            Toast.makeText(this, "Profile picture selected", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Error loading selected image: " + e.getMessage());
-                    Toast.makeText(this, "Error loading image", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
-
-    private Bitmap getResizedBitmap(Bitmap image, int maxSize) {
-        if (image == null) return null;
-
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        float bitmapRatio = (float) width / (float) height;
-        if (bitmapRatio > 1) {
-            width = maxSize;
-            height = (int) (width / bitmapRatio);
-        } else {
-            height = maxSize;
-            width = (int) (height * bitmapRatio);
-        }
-
-        return Bitmap.createScaledBitmap(image, width, height, true);
+            Toast.makeText(this, "Image Upload System added yet", Toast.LENGTH_SHORT).show();
     }
 
     private void updateProfile() {
@@ -258,7 +185,6 @@ public class EditProfileActivity extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
         String department = etDepartment.getText().toString().trim();
-        String address = etAddress.getText().toString().trim();
 
         // Basic validation
         if (name.isEmpty()) {
@@ -272,7 +198,7 @@ public class EditProfileActivity extends AppCompatActivity {
         }
 
         // Get user type specific fields
-        String studentId = "";
+        String studentSection = "";
         String semester = "";
         String cgpa = "";
         String intake = "";
@@ -280,8 +206,8 @@ public class EditProfileActivity extends AppCompatActivity {
         String designation = "";
 
         if (sessionManager.isStudent()) {
-            studentId = etStudentId.getText().toString().trim();
-            semester = etSemester.getText().toString().trim();
+            studentSection = etSection.getText().toString().trim();
+//            semester = etSemester.getText().toString().trim();
             cgpa = etCgpa.getText().toString().trim();
             intake = etIntake.getText().toString().trim();
         }
@@ -302,8 +228,8 @@ public class EditProfileActivity extends AppCompatActivity {
 
         // Add user type specific fields
         if (sessionManager.isStudent()) {
-            updateRequest.setStudentId(studentId.isEmpty() ? null : studentId);
-            updateRequest.setSemester(semester.isEmpty() ? null : semester);
+            updateRequest.setSection(studentSection.isEmpty() ? null : studentSection);
+//            updateRequest.setSemester(semester.isEmpty() ? null : semester);
             updateRequest.setCgpa(cgpa.isEmpty() ? null : cgpa);
             updateRequest.setIntake(intake.isEmpty() ? null : intake);
         }
@@ -361,20 +287,6 @@ public class EditProfileActivity extends AppCompatActivity {
                 Toast.makeText(EditProfileActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private String bitmapToBase64(Bitmap bitmap) {
-        if (bitmap == null) return "";
-
-        try {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
-            byte[] byteArray = byteArrayOutputStream.toByteArray();
-            return Base64.encodeToString(byteArray, Base64.DEFAULT);
-        } catch (Exception e) {
-            Log.e(TAG, "Error converting bitmap to Base64: " + e.getMessage());
-            return "";
-        }
     }
 
     private void updateSessionData(ProfileUpdateResponse updateResponse) {

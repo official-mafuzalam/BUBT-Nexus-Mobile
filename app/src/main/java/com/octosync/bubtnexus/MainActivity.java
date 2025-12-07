@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,14 +17,20 @@ import androidx.cardview.widget.CardView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.textfield.TextInputEditText;
+import com.octosync.bubtnexus.models.NoticesResponse;
+import com.octosync.bubtnexus.models.SemesterOption;
+import com.octosync.bubtnexus.models.SemesterOptionsResponse;
 import com.octosync.bubtnexus.models.UserResponse;
 import com.octosync.bubtnexus.network.ApiClient;
 import com.octosync.bubtnexus.network.ApiService;
 import com.octosync.bubtnexus.utils.SessionManager;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -145,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Get student data from session manager
         String studentId = sessionManager.getStudentId();
-        String programCode = sessionManager.getProgramCode();
         String programName = sessionManager.getProgramName();
         int intake = sessionManager.getIntake();
         int section = sessionManager.getSection();

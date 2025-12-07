@@ -127,7 +127,7 @@
                     android:visibility="gone"
                     app:cardBackgroundColor="?attr/colorSurface"
                     app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp">
+                    app:cardElevation="4dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -135,70 +135,98 @@
                         android:orientation="vertical"
                         android:padding="16dp">
 
+                        <!-- Header -->
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="12dp"
-                            android:text="Ride Status Actions"
+                            android:layout_marginBottom="16dp"
+                            android:text="Manage Ride Status"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
+                        <!-- Action Buttons Grid -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:orientation="vertical">
+                            android:orientation="horizontal"
+                            android:visibility="visible">
 
-                            <!-- Start Ride Button (for pending rides) -->
+                            <!-- Start Ride Button -->
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnStartRide"
-                                android:layout_width="match_parent"
+                                style="@style/Widget.Material3.Button"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
-                                android:text="Start Ride"
+                                android:layout_marginEnd="8dp"
+                                android:layout_weight="1"
+                                android:text="Start"
                                 android:textAllCaps="false"
-                                android:textColor="?attr/colorOnPrimary"
-                                android:textStyle="bold"
                                 android:visibility="gone"
-                                app:backgroundTint="@color/success_color" />
+                                app:backgroundTint="@color/success_color"
+                                app:cornerRadius="8dp"
+                                app:icon="@drawable/ic_play_arrow"
+                                app:iconTint="?android:attr/colorBackground" />
 
-                            <!-- Complete Ride Button (for active rides) -->
+                            <!-- Complete Ride Button -->
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnCompleteRide"
-                                android:layout_width="match_parent"
+                                style="@style/Widget.Material3.Button"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
-                                android:text="Complete Ride"
+                                android:layout_marginEnd="8dp"
+                                android:layout_weight="1"
+                                android:text="Complete"
                                 android:textAllCaps="false"
-                                android:textColor="?attr/colorOnPrimary"
-                                android:textStyle="bold"
                                 android:visibility="gone"
-                                app:backgroundTint="@color/success_color" />
+                                app:backgroundTint="@color/info_color"
+                                app:cornerRadius="8dp"
+                                app:icon="@drawable/ic_check"
+                                app:iconTint="?android:attr/colorBackground" />
 
-                            <!-- Cancel Ride Button (for pending/active rides) -->
+                            <!-- Cancel Ride Button -->
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnCancelRide"
-                                android:layout_width="match_parent"
+                                style="@style/Widget.Material3.Button"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="Cancel Ride"
+                                android:layout_weight="1"
+                                android:text="Cancel"
                                 android:textAllCaps="false"
-                                android:textColor="?attr/colorOnPrimary"
-                                android:textStyle="bold"
                                 android:visibility="gone"
-                                app:backgroundTint="@color/error_color" />
+                                app:backgroundTint="@color/error_color"
+                                app:cornerRadius="8dp"
+                                app:icon="@drawable/ic_close"
+                                app:iconTint="?android:attr/colorBackground" />
 
-                            <!-- Status Message -->
+                        </LinearLayout>
+
+                        <!-- Status Message -->
+                        <LinearLayout
+                            android:id="@+id/llStatusMessage"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:padding="12dp"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginEnd="8dp"
+                                app:tint="?attr/colorPrimary" />
+
                             <TextView
                                 android:id="@+id/tvStatusMessage"
-                                android:layout_width="match_parent"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:gravity="center"
-                                android:text="This ride cannot be modified"
-                                android:textColor="?attr/colorOnSurfaceVariant"
-                                android:textSize="12sp"
-                                android:visibility="gone" />
+                                android:layout_weight="1"
+                                android:text="This ride has been completed"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="14sp" />
 
                         </LinearLayout>
 

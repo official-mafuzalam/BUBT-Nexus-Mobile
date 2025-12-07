@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -44,8 +45,9 @@ public class RideCreateActivity extends AppCompatActivity {
     private EditText etVehicleType, etVehicleNumber, etNotes;
     private EditText etFromLat, etFromLng, etToLat, etToLng;
     private Button btnDepartureTime;
-    private ImageButton btnBack, btnSave, btnFromMap, btnToMap; // Added btnFromMap and btnToMap
+    private ImageButton btnBack, btnFromMap, btnToMap; // Added btnFromMap and btnToMap
     private TextView tvDepartureTime, tvError;
+    private CardView btnCreate;
     private ProgressBar progressBar;
 
     // Session
@@ -117,7 +119,7 @@ public class RideCreateActivity extends AppCompatActivity {
         // Buttons
         btnDepartureTime = findViewById(R.id.btnDepartureTime);
         btnBack = findViewById(R.id.btnBack);
-        btnSave = findViewById(R.id.btnSave);
+        btnCreate = findViewById(R.id.btnCreate);
         btnFromMap = findViewById(R.id.btnFromMap); // New
         btnToMap = findViewById(R.id.btnToMap);     // New
 
@@ -132,7 +134,7 @@ public class RideCreateActivity extends AppCompatActivity {
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
 
-        btnSave.setOnClickListener(v -> createRide());
+        btnCreate.setOnClickListener(v -> createRide());
 
         btnDepartureTime.setOnClickListener(v -> showDateTimePicker());
 
@@ -418,7 +420,7 @@ public class RideCreateActivity extends AppCompatActivity {
 
     private void showLoading(boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
-        btnSave.setEnabled(!show);
+        btnCreate.setEnabled(!show);
         btnBack.setEnabled(!show);
         btnDepartureTime.setEnabled(!show);
     }

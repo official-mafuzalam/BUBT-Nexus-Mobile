@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary_color"
+    android:background="?attr/colorPrimary"
     android:orientation="vertical"
     tools:context=".ProfileActivity">
 
@@ -32,7 +32,7 @@
                 android:layout_height="40dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_arrow_back"
-                app:tint="@color/white" />
+                app:tint="?attr/colorOnPrimary" />
 
             <TextView
                 android:layout_width="0dp"
@@ -42,7 +42,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:text="My Profile"
-                android:textColor="@color/white"
+                android:textColor="?attr/colorOnPrimary"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
@@ -61,7 +61,7 @@
             android:alpha="0.8"
             android:fontFamily="sans-serif"
             android:text="Monday, 15 January"
-            android:textColor="@color/white"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="14sp" />
 
     </LinearLayout>
@@ -72,494 +72,460 @@
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:layout_weight="1"
-        app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="32dp"
-        app:cardElevation="8dp">
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="0dp">
 
-        <ScrollView
+        <!-- Wrap content in a layout with background -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:background="@drawable/card_top_rounded"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:fillViewport="true">
 
-                <!-- Profile Header Section -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="32dp">
+                    android:orientation="vertical">
 
-                    <!-- Profile Picture -->
-                    <ImageView
-                        android:id="@+id/ivProfile"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
-                        android:layout_marginBottom="16dp"
-                        android:background="@drawable/circle_background"
-                        android:padding="20dp"
-                        android:src="@drawable/ic_person"
-                        app:tint="@color/primary_color" />
-
-                    <!-- Name -->
-                    <TextView
-                        android:id="@+id/tvUserName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="Rahat Hasan"
-                        android:textColor="@color/text_primary"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-
-                    <!-- Email -->
-                    <TextView
-                        android:id="@+id/tvEmail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:fontFamily="sans-serif"
-                        android:text=""
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp" />
-
-                    <!-- Designation -->
-                    <TextView
-                        android:id="@+id/tvDesignation"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:fontFamily="sans-serif"
-                        android:text=""
-                        android:textColor="@color/text_secondary"
-                        android:textSize="16sp" />
-
-                    <!-- Department -->
-                    <TextView
-                        android:id="@+id/tvDepartment"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/department_background"
-                        android:fontFamily="sans-serif"
-                        android:paddingHorizontal="16dp"
-                        android:paddingVertical="8dp"
-                        android:text="CSE"
-                        android:textColor="@color/primary_color"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <!-- Info Section -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingHorizontal="24dp"
-                    android:paddingBottom="24dp">
-
-                    <!-- Section Title -->
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="Personal Information"
-                        android:textColor="@color/text_primary"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <!-- 2-Column Grid Layout -->
-                    <GridLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:alignmentMode="alignMargins"
-                        android:columnCount="2"
-                        android:columnOrderPreserved="false"
-                        android:padding="8dp"
-                        android:rowCount="4">
-
-                        <!-- Semester -->
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_rowWeight="1"
-                            android:layout_columnWeight="1"
-                            android:layout_margin="8dp"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:cardUseCompatPadding="true">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:padding="16dp">
-
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:src="@drawable/ic_school"
-                                    app:tint="@color/primary_color" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="4dp"
-                                    android:fontFamily="sans-serif"
-                                    android:text="Semester"
-                                    android:textColor="@color/text_secondary"
-                                    android:textSize="12sp" />
-
-                                <TextView
-                                    android:id="@+id/tvSemester"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:text="Fall"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-                        </androidx.cardview.widget.CardView>
-
-                        <!-- Student ID -->
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_rowWeight="1"
-                            android:layout_columnWeight="1"
-                            android:layout_margin="8dp"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:cardUseCompatPadding="true">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:padding="16dp">
-
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:src="@drawable/ic_school"
-                                    app:tint="@color/primary_color" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="4dp"
-                                    android:fontFamily="sans-serif"
-                                    android:text="Student ID"
-                                    android:textColor="@color/text_secondary"
-                                    android:textSize="12sp" />
-
-                                <TextView
-                                    android:id="@+id/tvStudentId"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:text="643"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-                        </androidx.cardview.widget.CardView>
-
-                        <!-- Department -->
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_rowWeight="1"
-                            android:layout_columnWeight="1"
-                            android:layout_margin="8dp"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:cardUseCompatPadding="true">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:padding="16dp">
-
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:src="@drawable/ic_school"
-                                    app:tint="@color/primary_color" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="4dp"
-                                    android:fontFamily="sans-serif"
-                                    android:text="Department"
-                                    android:textColor="@color/text_secondary"
-                                    android:textSize="12sp" />
-
-                                <TextView
-                                    android:id="@+id/tvDepartmentCard"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:text="CSE"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-                        </androidx.cardview.widget.CardView>
-
-                        <!-- Phone -->
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_rowWeight="1"
-                            android:layout_columnWeight="1"
-                            android:layout_margin="8dp"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:cardUseCompatPadding="true">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:padding="16dp">
-
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:src="@drawable/ic_phone"
-                                    app:tint="@color/primary_color" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="4dp"
-                                    android:fontFamily="sans-serif"
-                                    android:text="Phone"
-                                    android:textColor="@color/text_secondary"
-                                    android:textSize="12sp" />
-
-                                <TextView
-                                    android:id="@+id/tvPhone"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:text="+8801621833839"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-                        </androidx.cardview.widget.CardView>
-
-                        <!-- CGPA -->
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_rowWeight="1"
-                            android:layout_columnWeight="1"
-                            android:layout_margin="8dp"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:cardUseCompatPadding="true">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:padding="16dp">
-
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:src="@drawable/ic_school"
-                                    app:tint="@color/primary_color" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="4dp"
-                                    android:fontFamily="sans-serif"
-                                    android:text="CGPA"
-                                    android:textColor="@color/text_secondary"
-                                    android:textSize="12sp" />
-
-                                <TextView
-                                    android:id="@+id/tvCgpa"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:text="N/A"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-                        </androidx.cardview.widget.CardView>
-
-                        <!-- Program -->
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_rowWeight="1"
-                            android:layout_columnWeight="1"
-                            android:layout_margin="8dp"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:cardUseCompatPadding="true">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:padding="16dp">
-
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:src="@drawable/ic_school"
-                                    app:tint="@color/primary_color" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="4dp"
-                                    android:fontFamily="sans-serif"
-                                    android:text="Program"
-                                    android:textColor="@color/text_secondary"
-                                    android:textSize="12sp" />
-
-                                <TextView
-                                    android:id="@+id/tvProgram"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:text="N/A"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-                        </androidx.cardview.widget.CardView>
-
-                        <!-- Intake -->
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_rowWeight="1"
-                            android:layout_columnWeight="1"
-                            android:layout_margin="8dp"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:cardUseCompatPadding="true">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:padding="16dp">
-
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:src="@drawable/ic_school"
-                                    app:tint="@color/primary_color" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="4dp"
-                                    android:fontFamily="sans-serif"
-                                    android:text="Intake"
-                                    android:textColor="@color/text_secondary"
-                                    android:textSize="12sp" />
-
-                                <TextView
-                                    android:id="@+id/tvBatch"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:text="N/A"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-                        </androidx.cardview.widget.CardView>
-
-                    </GridLayout>
-
-                    <!-- Action Buttons -->
+                    <!-- Profile Header Section -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
-                        android:orientation="horizontal">
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="32dp">
 
-                        <!-- Edit Profile Button -->
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnEditProfile"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:layout_weight="1"
-                            android:backgroundTint="@color/white"
-                            android:text="Edit Profile"
-                            android:textColor="@color/primary_color"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            app:cornerRadius="12dp"
-                            app:strokeColor="@color/primary_color"
-                            app:strokeWidth="1dp" />
+                        <!-- Profile Picture -->
+                        <ImageView
+                            android:id="@+id/ivProfile"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:layout_marginBottom="16dp"
+                            android:background="@drawable/circle_background"
+                            android:padding="20dp"
+                            android:src="@drawable/ic_person"
+                            app:tint="?attr/colorPrimary" />
 
-                        <!-- Settings Button -->
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnSettings"
-                            android:layout_width="0dp"
+                        <!-- Name -->
+                        <TextView
+                            android:id="@+id/tvUserName"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:layout_weight="1"
-                            android:backgroundTint="@color/primary_color"
-                            android:text="Settings"
-                            android:textColor="@color/white"
+                            android:layout_marginBottom="4dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="Rahat Hasan"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <!-- Email -->
+                        <TextView
+                            android:id="@+id/tvEmail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:fontFamily="sans-serif"
+                            android:text=""
+                            android:textColor="?android:attr/textColorSecondary"
+                            android:textSize="16sp" />
+
+                        <!-- Designation -->
+                        <TextView
+                            android:id="@+id/tvDesignation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:fontFamily="sans-serif"
+                            android:text=""
+                            android:textColor="?android:attr/textColorSecondary"
+                            android:textSize="16sp" />
+
+                        <!-- Department Badge -->
+                        <TextView
+                            android:id="@+id/tvDepartment"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/department_background"
+                            android:fontFamily="sans-serif"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="8dp"
+                            android:text="CSE"
+                            android:textColor="?attr/colorPrimary"
                             android:textSize="14sp"
-                            android:textStyle="bold"
-                            app:cornerRadius="12dp" />
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <!-- Info Section -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="24dp"
+                        android:paddingBottom="24dp">
+
+                        <!-- Section Title -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="Personal Information"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <!-- 2-Column Grid Layout -->
+                        <GridLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:alignmentMode="alignMargins"
+                            android:columnCount="2"
+                            android:columnOrderPreserved="false"
+                            android:padding="8dp"
+                            android:rowCount="4">
+
+                            <!-- Semester -->
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_rowWeight="1"
+                                android:layout_columnWeight="1"
+                                android:layout_margin="8dp"
+                                app:cardBackgroundColor="?attr/cardBackgroundColor"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="2dp"
+                                app:cardUseCompatPadding="true">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:orientation="vertical"
+                                    android:padding="16dp">
+
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:layout_marginBottom="8dp"
+                                        android:src="@drawable/ic_school"
+                                        app:tint="?attr/colorPrimary" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="4dp"
+                                        android:fontFamily="sans-serif"
+                                        android:text="Semester"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvSemester"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="sans-serif-medium"
+                                        android:text="Fall"
+                                        android:textColor="?android:attr/textColorPrimary"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
+                            <!-- Student ID -->
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_rowWeight="1"
+                                android:layout_columnWeight="1"
+                                android:layout_margin="8dp"
+                                app:cardBackgroundColor="?attr/cardBackgroundColor"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="2dp"
+                                app:cardUseCompatPadding="true">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:orientation="vertical"
+                                    android:padding="16dp">
+
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:layout_marginBottom="8dp"
+                                        android:src="@drawable/ic_school"
+                                        app:tint="?attr/colorPrimary" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="4dp"
+                                        android:fontFamily="sans-serif"
+                                        android:text="Student ID"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvStudentId"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="sans-serif-medium"
+                                        android:text="643"
+                                        android:textColor="?android:attr/textColorPrimary"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
+                            <!-- Department -->
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_rowWeight="1"
+                                android:layout_columnWeight="1"
+                                android:layout_margin="8dp"
+                                app:cardBackgroundColor="?attr/cardBackgroundColor"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="2dp"
+                                app:cardUseCompatPadding="true">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:orientation="vertical"
+                                    android:padding="16dp">
+
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:layout_marginBottom="8dp"
+                                        android:src="@drawable/ic_school"
+                                        app:tint="?attr/colorPrimary" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="4dp"
+                                        android:fontFamily="sans-serif"
+                                        android:text="Department"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvDepartmentCard"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="sans-serif-medium"
+                                        android:text="CSE"
+                                        android:textColor="?android:attr/textColorPrimary"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
+                            <!-- Phone -->
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_rowWeight="1"
+                                android:layout_columnWeight="1"
+                                android:layout_margin="8dp"
+                                app:cardBackgroundColor="?attr/cardBackgroundColor"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="2dp"
+                                app:cardUseCompatPadding="true">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:orientation="vertical"
+                                    android:padding="16dp">
+
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:layout_marginBottom="8dp"
+                                        android:src="@drawable/ic_phone"
+                                        app:tint="?attr/colorPrimary" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="4dp"
+                                        android:fontFamily="sans-serif"
+                                        android:text="Phone"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvPhone"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="sans-serif-medium"
+                                        android:text="+8801621833839"
+                                        android:textColor="?android:attr/textColorPrimary"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
+                            <!-- CGPA -->
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_rowWeight="1"
+                                android:layout_columnWeight="1"
+                                android:layout_margin="8dp"
+                                app:cardBackgroundColor="?attr/cardBackgroundColor"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="2dp"
+                                app:cardUseCompatPadding="true">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:orientation="vertical"
+                                    android:padding="16dp">
+
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:layout_marginBottom="8dp"
+                                        android:src="@drawable/ic_school"
+                                        app:tint="?attr/colorPrimary" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="4dp"
+                                        android:fontFamily="sans-serif"
+                                        android:text="CGPA"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvCgpa"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="sans-serif-medium"
+                                        android:text="N/A"
+                                        android:textColor="?android:attr/textColorPrimary"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
+                            <!-- Intake -->
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_rowWeight="1"
+                                android:layout_columnWeight="1"
+                                android:layout_margin="8dp"
+                                app:cardBackgroundColor="?attr/cardBackgroundColor"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="2dp"
+                                app:cardUseCompatPadding="true">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:orientation="vertical"
+                                    android:padding="16dp">
+
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:layout_marginBottom="8dp"
+                                        android:src="@drawable/ic_school"
+                                        app:tint="?attr/colorPrimary" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="4dp"
+                                        android:fontFamily="sans-serif"
+                                        android:text="Intake"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvBatch"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="sans-serif-medium"
+                                        android:text="N/A"
+                                        android:textColor="?android:attr/textColorPrimary"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
+                        </GridLayout>
+
+                        <!-- Action Buttons -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="24dp"
+                            android:orientation="horizontal">
+
+                            <!-- Edit Profile Button -->
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnEditProfile"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:layout_weight="1"
+                                android:backgroundTint="?android:attr/colorBackground"
+                                android:text="Edit Profile"
+                                android:textColor="?attr/colorPrimary"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:cornerRadius="12dp"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp" />
+
+                            <!-- Settings Button -->
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnSettings"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:layout_weight="1"
+                                android:backgroundTint="?attr/colorPrimary"
+                                android:text="Settings"
+                                android:textColor="?attr/colorOnPrimary"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:cornerRadius="12dp" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
                 </LinearLayout>
 
-            </LinearLayout>
-
-        </ScrollView>
-
+            </ScrollView>
+        </LinearLayout>
     </androidx.cardview.widget.CardView>
 
     <!-- Bottom Navigation -->
@@ -567,7 +533,7 @@
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="?android:attr/colorBackground"
         app:itemIconTint="@color/nav_color_state"
         app:itemTextColor="@color/nav_color_state"
         app:labelVisibilityMode="labeled"

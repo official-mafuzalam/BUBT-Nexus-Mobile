@@ -16,18 +16,29 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
+import com.octosync.bubtnexus.models.SemesterOption;
+import com.octosync.bubtnexus.models.SemesterOptionsResponse;
+import com.octosync.bubtnexus.network.ApiClient;
+import com.octosync.bubtnexus.network.ApiService;
 import com.octosync.bubtnexus.utils.SessionManager;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = "ProfileActivity";
 
     private BottomNavigationView bottomNavigation;
     private SessionManager sessionManager;
-    private TextView tvUserName, tvStudentId, tvDepartment, tvEmail, tvPhone, tvSemester, tvBatch, tvDate, tvDesignation;
+    private TextView tvUserName, tvStudentId, tvDepartment, tvEmail, tvPhone, tvSemester, tvBatch, tvDate, tvDesignation, tvCgpa;
     private MaterialButton btnEditProfile, btnSettings;
     private ImageButton btnBack;
     private ImageView ivProfile;
@@ -50,6 +61,7 @@ public class ProfileActivity extends AppCompatActivity {
         setupBottomNavigation();
         setCurrentDate();
         loadUserData();
+        loadSemesters();
     }
 
     private boolean isUserLoggedIn() {
@@ -66,6 +78,7 @@ public class ProfileActivity extends AppCompatActivity {
         tvSemester = findViewById(R.id.tvSemester);
         tvBatch = findViewById(R.id.tvBatch);
         tvDate = findViewById(R.id.tvDate);
+        tvCgpa = findViewById(R.id.tvCgpa);
         tvDesignation = findViewById(R.id.tvDesignation); // Add this if exists
 
         // ImageView
@@ -173,13 +186,12 @@ public class ProfileActivity extends AppCompatActivity {
             String studentId = sessionManager.getStudentId();
             String department = sessionManager.getDepartment();
             String phone = sessionManager.getPhone();
-            String semester = sessionManager.getSemester();
-            String program = sessionManager.getProgram();
+            String program = sessionManager.getProgramName();
             String facultyCode = sessionManager.getFacultyCode(); // Changed from getFacultyId()
             String designation = sessionManager.getDesignation();
-            String intake = String.valueOf(sessionManager.getIntake()); // Changed to String
-            String cgpa = sessionManager.getCgpa();
+            int intake = sessionManager.getIntake();
             int section = sessionManager.getSection();
+            String cgpa = sessionManager.getCgpa();
 
             String userType = sessionManager.getUserType();
             boolean isStudent = sessionManager.isStudent();
@@ -202,16 +214,13 @@ public class ProfileActivity extends AppCompatActivity {
                     tvStudentId.setText(displayStudentId);
                 }
 
-                if (tvSemester != null) {
-                    String displaySemester = semester != null ? semester + " Semester" : "Not specified";
-                    tvSemester.setText(displaySemester);
+                if (cgpa != null) {
+                    String displayCgpa = cgpa != null ? cgpa : "Not specified";
+                    tvCgpa.setText(displayCgpa);
                 }
 
                 if (tvBatch != null) {
-                    String batchText = "Intake: " + intake + ", Section: " + section;
-                    if (cgpa != null) {
-                        batchText += ", CGPA: " + cgpa;
-                    }
+                    String batchText = intake + " - " + section;
                     tvBatch.setText(batchText);
                 }
 
@@ -278,6 +287,63 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    private void loadSemesters() {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+
+        Call<SemesterOptionsResponse> call = apiService.getSemesterOptions();
+
+        call.enqueue(new Callback<SemesterOptionsResponse>() {
+            @Override
+            public void onResponse(Call<SemesterOptionsResponse> call, Response<SemesterOptionsResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    SemesterOptionsResponse semesterResponse = response.body();
+                    if (semesterResponse.isSuccess() && semesterResponse.getData() != null) {
+                        Map<String, String> semesterMap = semesterResponse.getData();
+
+                        // Convert map to list of SemesterOption objects
+                        List<SemesterOption> semesterOptions = new ArrayList<>();
+                        List<String> semesterNames = new ArrayList<>();
+
+                        for (Map.Entry<String, String> entry : semesterMap.entrySet()) {
+                            String semesterName = entry.getKey();
+                            String semesterCode = entry.getValue();
+
+                            // Create SemesterOption object
+                            SemesterOption option = new SemesterOption(semesterName, semesterCode);
+                            semesterOptions.add(option);
+
+                            // Add to names list for spinner
+                            semesterNames.add(semesterName);
+                        }
+
+                        // Get semester code from session
+                        String semesterCodeFromSession = sessionManager.getSemester();
+                        String semesterNameToShow = "N/A"; // Default value
+
+                        // Find the semester name that matches the code
+                        for (SemesterOption option : semesterOptions) {
+                            if (option.getCode().equals(semesterCodeFromSession)) {
+                                semesterNameToShow = option.getName();
+                                break;
+                            }
+                        }
+                        if (tvSemester != null) {
+                            tvSemester.setText(semesterNameToShow);
+                        }
+                    } else {
+                        Log.e("SemesterData", "Response not successful or data is null");
+                    }
+                } else {
+                    Log.e("SemesterData", "Response not successful: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SemesterOptionsResponse> call, Throwable t) {
+                Log.e("SemesterData", "Failed to load semesters: " + t.getMessage());
+            }
+        });
+    }
     private void loadProfilePicture() {
         try {
             // Get profile picture from session manager

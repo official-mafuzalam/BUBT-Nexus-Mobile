@@ -366,9 +366,7 @@ public class RideSharingActivity extends AppCompatActivity implements RideAdapte
     @Override
     protected void onResume() {
         super.onResume();
-        // Refresh rides when activity resumes
-        if (rideAdapter == null || rideAdapter.getItemCount() == 0) {
-            loadNearbyRides();
-        }
+        loadNearbyRides();
     }
+
 }

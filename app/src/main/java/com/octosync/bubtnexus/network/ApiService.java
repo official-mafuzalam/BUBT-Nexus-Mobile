@@ -1,6 +1,7 @@
 package com.octosync.bubtnexus.network;
 
 import com.octosync.bubtnexus.models.*;
+
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -30,7 +31,7 @@ public interface ApiService {
             @Field("section") String section
     );
 
-    @PUT("profile")
+    @PUT("profile-update")
     Call<ProfileUpdateResponse> updateProfile(
             @Header("Authorization") String token,
             @Body ProfileUpdateRequest profileUpdateRequest
@@ -79,4 +80,20 @@ public interface ApiService {
             @Path("rideId") int rideId,
             @Body UpdateRideStatusRequest request
     );
+
+    // Get all programs
+    @GET("programs")
+    Call<ProgramsResponse> getPrograms();
+
+    // Get semester options
+    @GET("semesters")
+    Call<SemesterOptionsResponse> getSemesterOptions();
+
+    // Get department options
+    @GET("departments")
+    Call<ListResponse> getDepartments();
+
+    // Get designation options
+    @GET("designations")
+    Call<ListResponse> getDesignations();
 }
