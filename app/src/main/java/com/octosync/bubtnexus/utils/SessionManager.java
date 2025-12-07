@@ -2,9 +2,8 @@ package com.octosync.bubtnexus.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 
-import com.octosync.bubtnexus.models.LoginResponse;
+import com.octosync.bubtnexus.models.User;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,21 +21,20 @@ public class SessionManager {
     private static final String KEY_IS_FACULTY = "is_faculty";
 
     // User Details Keys
+    private static final String KEY_IS_VERIFIED = "is_verified";
     private static final String KEY_SEMESTER = "semester";
     private static final String KEY_INTAKE = "intake";
-    private static final String KEY_PROGRAM = "program";
+    private static final String KEY_SECTION = "section";
     private static final String KEY_STUDENT_ID = "student_id";
     private static final String KEY_CGPA = "cgpa";
+    private static final String KEY_PROGRAM_ID = "program_id";
+    private static final String KEY_PROGRAM_NAME = "program_name";
+    private static final String KEY_PROGRAM_CODE = "program_code";
     private static final String KEY_DEPARTMENT = "department";
-    private static final String KEY_FACULTY_ID = "faculty_id";
+    private static final String KEY_FACULTY_CODE = "faculty_code";
     private static final String KEY_DESIGNATION = "designation";
-    private static final String KEY_OFFICE_ROOM = "office_room";
-    private static final String KEY_OFFICE_HOURS = "office_hours";
     private static final String KEY_PHONE = "phone";
-    private static final String KEY_ADDRESS = "address";
-    private static final String KEY_DATE_OF_BIRTH = "date_of_birth";
-    private static final String KEY_EMERGENCY_CONTACT = "emergency_contact";
-    private static final String KEY_PROFILE_PICTURE_URI = "profile_picture_uri";
+    private static final String KEY_PROFILE_PICTURE = "profile_picture";
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -46,18 +44,9 @@ public class SessionManager {
         editor = sharedPreferences.edit();
     }
 
+    // Save methods
     public void saveToken(String token) {
         editor.putString(KEY_TOKEN, token);
-        editor.apply();
-    }
-
-    public String getToken() {
-        return sharedPreferences.getString(KEY_TOKEN, null);
-    }
-
-    public void saveUserData(String name, String email) {
-        editor.putString(KEY_USER_NAME, name);
-        editor.putString(KEY_USER_EMAIL, email);
         editor.apply();
     }
 
@@ -70,44 +59,39 @@ public class SessionManager {
         editor.apply();
     }
 
-    public void saveUserDetails(LoginResponse.User.UserDetails details) {
-        if (details != null) {
-            editor.putString(KEY_SEMESTER, details.getSemester());
-            editor.putString(KEY_INTAKE, details.getIntake());
-            editor.putString(KEY_PROGRAM, details.getProgram());
-            editor.putString(KEY_STUDENT_ID, details.getStudentId());
-            editor.putString(KEY_DEPARTMENT, details.getDepartment());
-            editor.putString(KEY_FACULTY_ID, details.getFacultyId());
-            editor.putString(KEY_DESIGNATION, details.getDesignation());
-            editor.putString(KEY_OFFICE_ROOM, details.getOfficeRoom());
-            editor.putString(KEY_OFFICE_HOURS, details.getOfficeHours());
-            editor.putString(KEY_PHONE, details.getPhone());
-            editor.putString(KEY_ADDRESS, details.getAddress());
-            editor.putString(KEY_DATE_OF_BIRTH, details.getDateOfBirth());
-            editor.putString(KEY_EMERGENCY_CONTACT, details.getEmergencyContact());
+    public void saveUserId(int userId) {
+        editor.putInt(KEY_USER_ID, userId);
+        editor.apply();
+    }
 
-            if (details.getCgpa() != null) {
-                editor.putFloat(KEY_CGPA, details.getCgpa().floatValue());
-            } else {
-                editor.remove(KEY_CGPA);
+    public void saveUserDetails(User.UserDetails details) {
+        if (details != null) {
+            editor.putString(KEY_IS_VERIFIED, details.getIsVerified());
+            editor.putString(KEY_SEMESTER, details.getSemester());
+            editor.putInt(KEY_INTAKE, details.getIntake());
+            editor.putInt(KEY_SECTION, details.getSection());
+            editor.putString(KEY_STUDENT_ID, details.getStudentId());
+            editor.putString(KEY_CGPA, details.getCgpa());
+            editor.putString(KEY_DEPARTMENT, details.getDepartment());
+            editor.putString(KEY_FACULTY_CODE, details.getFacultyCode());
+            editor.putString(KEY_DESIGNATION, details.getDesignation());
+            editor.putString(KEY_PHONE, details.getPhone());
+            editor.putString(KEY_PROFILE_PICTURE, details.getProfilePicture());
+
+            // Save program information if available
+            if (details.getProgram() != null) {
+                editor.putInt(KEY_PROGRAM_ID, details.getProgram().getId());
+                editor.putString(KEY_PROGRAM_NAME, details.getProgram().getName());
+                editor.putString(KEY_PROGRAM_CODE, details.getProgram().getCode());
             }
+
             editor.apply();
         }
     }
 
-    // Profile Picture Methods (Local storage only)
-    public void saveProfilePictureUri(String uriString) {
-        editor.putString(KEY_PROFILE_PICTURE_URI, uriString);
-        editor.apply();
-    }
-
-    public String getProfilePictureUri() {
-        return sharedPreferences.getString(KEY_PROFILE_PICTURE_URI, null);
-    }
-
-    public void removeProfilePicture() {
-        editor.remove(KEY_PROFILE_PICTURE_URI);
-        editor.apply();
+    // Getters
+    public String getToken() {
+        return sharedPreferences.getString(KEY_TOKEN, null);
     }
 
     public String getUserName() {
@@ -118,23 +102,8 @@ public class SessionManager {
         return sharedPreferences.getString(KEY_USER_EMAIL, null);
     }
 
-    public void saveUserId(int userId) {
-        editor.putInt(KEY_USER_ID, userId);
-        editor.apply();
-    }
-
     public int getUserId() {
         return sharedPreferences.getInt(KEY_USER_ID, -1);
-    }
-
-    public void saveUserRoles(List<String> roles) {
-        Set<String> rolesSet = new HashSet<>(roles);
-        editor.putStringSet(KEY_USER_ROLES, rolesSet);
-        editor.apply();
-    }
-
-    public Set<String> getUserRoles() {
-        return sharedPreferences.getStringSet(KEY_USER_ROLES, new HashSet<>());
     }
 
     public String getUserType() {
@@ -150,65 +119,84 @@ public class SessionManager {
     }
 
     // User Details Getters
+    public String getIsVerified() {
+        return sharedPreferences.getString(KEY_IS_VERIFIED, null);
+    }
+
     public String getSemester() {
         return sharedPreferences.getString(KEY_SEMESTER, null);
     }
 
-    public String getIntake() {
-        return sharedPreferences.getString(KEY_INTAKE, null);
+    public int getIntake() {
+        return sharedPreferences.getInt(KEY_INTAKE, 0);
     }
 
-    public String getProgram() {
-        return sharedPreferences.getString(KEY_PROGRAM, null);
+    public int getSection() {
+        return sharedPreferences.getInt(KEY_SECTION, 0);
     }
 
     public String getStudentId() {
         return sharedPreferences.getString(KEY_STUDENT_ID, null);
     }
 
+    public String getCgpa() {
+        return sharedPreferences.getString(KEY_CGPA, null);
+    }
+
+    public int getProgramId() {
+        return sharedPreferences.getInt(KEY_PROGRAM_ID, 0);
+    }
+
+    public String getProgramName() {
+        return sharedPreferences.getString(KEY_PROGRAM_NAME, null);
+    }
+
+    public String getProgramCode() {
+        return sharedPreferences.getString(KEY_PROGRAM_CODE, null);
+    }
+
+    // For backward compatibility - returns program code
+    public String getProgram() {
+        return getProgramCode();
+    }
+
     public String getDepartment() {
         return sharedPreferences.getString(KEY_DEPARTMENT, null);
     }
 
-    public String getFacultyId() {
-        return sharedPreferences.getString(KEY_FACULTY_ID, null);
+    public String getFacultyCode() {
+        return sharedPreferences.getString(KEY_FACULTY_CODE, null);
     }
 
     public String getDesignation() {
         return sharedPreferences.getString(KEY_DESIGNATION, null);
     }
 
-    public String getOfficeRoom() {
-        return sharedPreferences.getString(KEY_OFFICE_ROOM, null);
-    }
-
-    public String getOfficeHours() {
-        return sharedPreferences.getString(KEY_OFFICE_HOURS, null);
-    }
-
     public String getPhone() {
         return sharedPreferences.getString(KEY_PHONE, null);
     }
 
-    public String getAddress() {
-        return sharedPreferences.getString(KEY_ADDRESS, null);
+    public String getProfilePicture() {
+        return sharedPreferences.getString(KEY_PROFILE_PICTURE, null);
     }
 
-    public String getDateOfBirth() {
-        return sharedPreferences.getString(KEY_DATE_OF_BIRTH, null);
+    // Roles management
+    public void saveUserRoles(List<String> roles) {
+        Set<String> rolesSet = new HashSet<>(roles);
+        editor.putStringSet(KEY_USER_ROLES, rolesSet);
+        editor.apply();
     }
 
-    public String getEmergencyContact() {
-        return sharedPreferences.getString(KEY_EMERGENCY_CONTACT, null);
+    public Set<String> getUserRoles() {
+        return sharedPreferences.getStringSet(KEY_USER_ROLES, new HashSet<>());
     }
 
-    public Float getCgpa() {
-        if (sharedPreferences.contains(KEY_CGPA)) {
-            return sharedPreferences.getFloat(KEY_CGPA, 0.0f);
-        }
-        return null;
+    public boolean hasRole(String role) {
+        Set<String> roles = getUserRoles();
+        return roles.contains(role);
     }
 
+    // Clear session
     public void clear() {
         editor.clear().apply();
     }
@@ -216,55 +204,4 @@ public class SessionManager {
     public boolean isLoggedIn() {
         return getToken() != null;
     }
-
-    // Additional utility methods
-    public boolean hasRole(String role) {
-        Set<String> roles = getUserRoles();
-        return roles.contains(role);
-    }
-
-    public boolean isAdmin() {
-        return hasRole("admin") || hasRole("super_admin");
-    }
-
-    public void updateUserName(String name) {
-        editor.putString(KEY_USER_NAME, name);
-        editor.apply();
-    }
-
-    public void updateUserEmail(String email) {
-        editor.putString(KEY_USER_EMAIL, email);
-        editor.apply();
-    }
-
-    public void updateUserPhone(String phone) {
-        editor.putString(KEY_PHONE, phone);
-        editor.apply();
-    }
-
-    public void updateStudentId(String studentId) {
-        editor.putString(KEY_STUDENT_ID, studentId);
-        editor.apply();
-    }
-
-    public void updateUserDepartment(String department) {
-        editor.putString(KEY_DEPARTMENT, department);
-        editor.apply();
-    }
-
-    public void updateUserSemester(String semester) {
-        editor.putString(KEY_SEMESTER, semester);
-        editor.apply();
-    }
-
-    public void updateIntake(String intake) {
-        editor.putString(KEY_INTAKE, intake);
-        editor.apply();
-    }
-
-    public void updateUserAddress(String address) {
-        editor.putString(KEY_ADDRESS, address);
-        editor.apply();
-    }
-
 }

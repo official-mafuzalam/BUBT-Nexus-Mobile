@@ -48,7 +48,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_location"
+            android:src="@drawable/ic_check"
             app:tint="@color/white" />
 
     </LinearLayout>
@@ -401,33 +401,6 @@
                         android:gravity="top"
                         android:padding="12dp"
                         android:background="@drawable/edittext_background" />
-
-                </LinearLayout>
-
-                <!-- Location Buttons -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="16dp">
-
-                    <Button
-                        android:id="@+id/btnUseCurrentLocation"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Use Current Location"
-                        android:layout_marginEnd="8dp"
-                        style="@style/Widget.AppCompat.Button.Borderless" />
-
-                    <Button
-                        android:id="@+id/btnPickOnMap"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Pick on Map"
-                        android:layout_marginStart="8dp"
-                        style="@style/Widget.AppCompat.Button.Borderless" />
 
                 </LinearLayout>
 

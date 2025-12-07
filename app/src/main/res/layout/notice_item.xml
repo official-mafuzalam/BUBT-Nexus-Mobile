@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:elevation="4dp"
+    app:cardBackgroundColor="?attr/cardBackgroundColor"
     app:cardCornerRadius="8dp"
     app:cardUseCompatPadding="true">
 
@@ -22,7 +24,7 @@
             android:background="@drawable/category_badge"
             android:paddingHorizontal="12dp"
             android:paddingVertical="4dp"
-            android:textColor="@color/white"
+            android:textColor="?attr/colorOnPrimaryContainer"
             android:textSize="12sp"
             android:textStyle="bold" />
 
@@ -32,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="16sp"
             android:textStyle="bold"
             android:lineSpacingExtra="4dp" />
@@ -43,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="12sp" />
 
         <!-- Click to view link -->
@@ -53,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Click to view notice →"
-            android:textColor="@color/blue"
+            android:textColor="?attr/colorPrimary"
             android:textSize="12sp"
             android:textStyle="italic" />
 

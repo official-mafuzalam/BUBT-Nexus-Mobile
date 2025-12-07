@@ -43,7 +43,7 @@ public class RideCreateActivity extends AppCompatActivity {
     private EditText etFromLocation, etToLocation, etTotalSeats, etFarePerSeat;
     private EditText etVehicleType, etVehicleNumber, etNotes;
     private EditText etFromLat, etFromLng, etToLat, etToLng;
-    private Button btnDepartureTime, btnUseCurrentLocation, btnPickOnMap;
+    private Button btnDepartureTime;
     private ImageButton btnBack, btnSave, btnFromMap, btnToMap; // Added btnFromMap and btnToMap
     private TextView tvDepartureTime, tvError;
     private ProgressBar progressBar;
@@ -116,8 +116,6 @@ public class RideCreateActivity extends AppCompatActivity {
 
         // Buttons
         btnDepartureTime = findViewById(R.id.btnDepartureTime);
-        btnUseCurrentLocation = findViewById(R.id.btnUseCurrentLocation);
-        btnPickOnMap = findViewById(R.id.btnPickOnMap);
         btnBack = findViewById(R.id.btnBack);
         btnSave = findViewById(R.id.btnSave);
         btnFromMap = findViewById(R.id.btnFromMap); // New
@@ -138,23 +136,6 @@ public class RideCreateActivity extends AppCompatActivity {
 
         btnDepartureTime.setOnClickListener(v -> showDateTimePicker());
 
-        btnUseCurrentLocation.setOnClickListener(v -> {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
-                getCurrentLocationForAddress();
-            } else {
-                requestLocationPermission();
-            }
-        });
-
-        // Remove old btnPickOnMap listener
-        // btnPickOnMap.setOnClickListener(v -> {
-        //     // Open map picker for "from" location
-        //     Intent intent = new Intent(RideCreateActivity.this, MapPickerActivity.class);
-        //     intent.putExtra("location_type", "from");
-        //     startActivityForResult(intent, REQUEST_MAP_PICKER);
-        // });
-
         // Set BUBT as default "To" location
         setDefaultBUBTLocation();
 
@@ -169,8 +150,8 @@ public class RideCreateActivity extends AppCompatActivity {
     private void setDefaultBUBTLocation() {
         // Set BUBT as default "To" location
         etToLocation.setText("BUBT, Dhaka");
-        etToLat.setText("23.810331");
-        etToLng.setText("90.412521");
+        etToLat.setText("23.811706");
+        etToLng.setText("90.357175");
     }
 
     private void openMapPicker(String locationType) {
@@ -440,8 +421,6 @@ public class RideCreateActivity extends AppCompatActivity {
         btnSave.setEnabled(!show);
         btnBack.setEnabled(!show);
         btnDepartureTime.setEnabled(!show);
-        btnUseCurrentLocation.setEnabled(!show);
-        btnPickOnMap.setEnabled(!show);
     }
 
     private void showError(String message) {

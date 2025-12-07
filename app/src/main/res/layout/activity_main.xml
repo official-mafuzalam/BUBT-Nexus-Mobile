@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/primary_color"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <!-- Header Section -->
@@ -19,24 +19,38 @@
         <!-- Welcome Text -->
         <TextView
             android:id="@+id/tvWelcome"
+            style="@style/WelcomeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome, Rahat 👋"
-            style="@style/WelcomeText"
             android:layout_marginStart="24dp"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp"
+            android:text="Welcome, User 👋" />
 
         <!-- Date -->
         <TextView
             android:id="@+id/tvDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Monday, 15 January"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:alpha="0.8"
             android:layout_marginStart="24dp"
-            android:fontFamily="sans-serif"/>
+            android:alpha="0.8"
+            android:fontFamily="sans-serif"
+            android:text="Monday, 15 January"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="14sp" />
+
+        <!-- User Info (Student ID/Faculty Info) -->
+        <TextView
+            android:id="@+id/tvUserInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="4dp"
+            android:alpha="0.9"
+            android:fontFamily="sans-serif"
+            android:text=""
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="12sp"
+            android:visibility="gone" />
 
     </LinearLayout>
 
@@ -54,15 +68,16 @@
 
             <!-- Content Card -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/contentCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="32dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardElevation="8dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp">
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/card_background"
+                app:cardCornerRadius="32dp"
+                app:cardElevation="8dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -82,164 +97,181 @@
                         app:boxCornerRadiusTopEnd="24dp"
                         app:boxCornerRadiusTopStart="24dp"
                         app:startIconDrawable="@android:drawable/ic_menu_search"
-                        app:startIconTint="@color/text_hint">
+                        app:startIconTint="?attr/colorOnSurfaceVariant">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etSearch"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif"
                             android:hint="Search courses, assignments..."
-                            android:textSize="16sp"
-                            android:fontFamily="sans-serif"/>
+                            android:textColor="?attr/colorOnSurface"
+                            android:textColorHint="?attr/colorOnSurfaceVariant"
+                            android:textSize="16sp" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Section Title -->
+                    <!-- Section Title for Students -->
                     <TextView
+                        android:id="@+id/tvSectionTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginBottom="16dp"
+                        android:fontFamily="sans-serif-medium"
                         android:text="Quick Access"
-                        android:textColor="@color/text_primary"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium"
-                        android:layout_marginStart="24dp"
-                        android:layout_marginBottom="16dp"/>
+                        android:visibility="visible" />
 
-                    <!-- Grid Buttons -->
+                    <!-- Grid Buttons (Student View) -->
                     <GridLayout
                         android:id="@+id/gridButtons"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:columnCount="2"
-                        android:rowCount="3"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
-                        android:paddingBottom="16dp">
+                        android:paddingBottom="16dp"
+                        android:rowCount="3"
+                        android:visibility="visible">
 
                         <!-- Routine Button -->
                         <LinearLayout
+                            android:id="@+id/btnRoutine"
                             style="@style/GridButton"
                             android:layout_row="0"
-                            android:layout_column="0"
-                            android:id="@+id/btnRoutine">
+                            android:layout_column="0">
 
                             <ImageView
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
                                 android:src="@drawable/ic_calendar"
-                                app:tint="@color/primary_color" />
+                                app:tint="?attr/colorPrimary" />
+
                             <TextView
+                                android:id="@android:id/text1"
+                                style="@style/GridButtonText"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Routine"
-                                style="@style/GridButtonText"
-                                android:layout_marginTop="12dp"/>
+                                android:layout_marginTop="12dp"
+                                android:text="Routine" />
 
                         </LinearLayout>
 
                         <!-- Assignments Button -->
                         <LinearLayout
+                            android:id="@+id/btnAssignments"
                             style="@style/GridButton"
                             android:layout_row="0"
-                            android:layout_column="1"
-                            android:id="@+id/btnAssignments">
+                            android:layout_column="1">
 
                             <ImageView
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
                                 android:src="@drawable/library_books"
-                                app:tint="@color/primary_color"/>
+                                app:tint="?attr/colorPrimary" />
+
                             <TextView
+                                android:id="@android:id/text1"
+                                style="@style/GridButtonText"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Assignments"
-                                style="@style/GridButtonText"
-                                android:layout_marginTop="12dp"/>
+                                android:layout_marginTop="12dp"
+                                android:text="Assignments" />
 
                         </LinearLayout>
 
                         <!-- Notices Button -->
                         <LinearLayout
+                            android:id="@+id/btnNotices"
                             style="@style/GridButton"
                             android:layout_row="1"
-                            android:layout_column="0"
-                            android:id="@+id/btnNotices">
+                            android:layout_column="0">
 
                             <ImageView
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
                                 android:src="@drawable/ic_notifications"
-                                app:tint="@color/primary_color"/>
+                                app:tint="?attr/colorPrimary" />
+
                             <TextView
+                                android:id="@android:id/text1"
+                                style="@style/GridButtonText"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Notices"
-                                style="@style/GridButtonText"
-                                android:layout_marginTop="12dp"/>
+                                android:layout_marginTop="12dp"
+                                android:text="Notices" />
 
                         </LinearLayout>
 
                         <!-- Community Button -->
                         <LinearLayout
+                            android:id="@+id/btnCommunity"
                             style="@style/GridButton"
                             android:layout_row="1"
-                            android:layout_column="1"
-                            android:id="@+id/btnCommunity">
+                            android:layout_column="1">
 
                             <ImageView
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
                                 android:src="@drawable/ic_people"
-                                app:tint="@color/primary_color"/>
+                                app:tint="?attr/colorPrimary" />
+
                             <TextView
+                                android:id="@android:id/text1"
+                                style="@style/GridButtonText"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Community"
-                                style="@style/GridButtonText"
-                                android:layout_marginTop="12dp"/>
+                                android:layout_marginTop="12dp"
+                                android:text="Community" />
 
                         </LinearLayout>
 
                         <!-- Events Button -->
                         <LinearLayout
+                            android:id="@+id/btnEvents"
                             style="@style/GridButton"
                             android:layout_row="2"
-                            android:layout_column="0"
-                            android:id="@+id/btnEvents">
+                            android:layout_column="0">
 
                             <ImageView
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
                                 android:src="@drawable/ic_event"
-                                app:tint="@color/primary_color"/>
+                                app:tint="?attr/colorPrimary" />
+
                             <TextView
+                                android:id="@android:id/text1"
+                                style="@style/GridButtonText"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Events"
-                                style="@style/GridButtonText"
-                                android:layout_marginTop="12dp"/>
+                                android:layout_marginTop="12dp"
+                                android:text="Events" />
 
                         </LinearLayout>
 
-                        <!-- Profile Button -->
+                        <!-- Ride Sharing Button -->
                         <LinearLayout
+                            android:id="@+id/btnRide"
                             style="@style/GridButton"
                             android:layout_row="2"
-                            android:layout_column="1"
-                            android:id="@+id/btnRide">
+                            android:layout_column="1">
 
                             <ImageView
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
                                 android:src="@drawable/ic_bike"
-                                app:tint="@color/primary_color"/>
+                                app:tint="?attr/colorPrimary" />
+
                             <TextView
+                                android:id="@android:id/text1"
+                                style="@style/GridButtonText"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Ride Sharing"
-                                style="@style/GridButtonText"
-                                android:layout_marginTop="12dp"/>
+                                android:layout_marginTop="12dp"
+                                android:text="Ride Sharing" />
 
                         </LinearLayout>
 
@@ -258,10 +290,10 @@
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:menu="@menu/bottom_nav_menu"
-        app:labelVisibilityMode="labeled"
+        android:background="?attr/colorSurface"
         app:itemIconTint="@color/nav_color_state"
-        app:itemTextColor="@color/nav_color_state"/>
+        app:itemTextColor="@color/nav_color_state"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>

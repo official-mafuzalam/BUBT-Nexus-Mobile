@@ -36,7 +36,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         sessionManager = new SessionManager(this);
         initializeViews();
-        setupListeners();
+//        setupListeners();
     }
 
     private void initializeViews() {
@@ -53,122 +53,122 @@ public class RegisterActivity extends AppCompatActivity {
         textViewError.setVisibility(View.GONE);
     }
 
-    private void setupListeners() {
-        buttonRegister.setOnClickListener(v -> registerUser());
+//    private void setupListeners() {
+//        buttonRegister.setOnClickListener(v -> registerUser());
+//
+//        textViewLogin.setOnClickListener(v -> {
+//            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+//            startActivity(intent);
+//            finish();
+//        });
+//    }
 
-        textViewLogin.setOnClickListener(v -> {
-            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-            startActivity(intent);
-            finish();
-        });
-    }
-
-    private void registerUser() {
-        String name = editTextName.getText().toString().trim();
-        String email = editTextEmail.getText().toString().trim();
-        String password = editTextPassword.getText().toString().trim();
-        String confirmPassword = editTextConfirmPassword.getText().toString().trim();
-
-        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            showError("Please fill all fields");
-            return;
-        }
-
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            showError("Invalid email address");
-            return;
-        }
-
-        if (password.length() < 6) {
-            showError("Password must be at least 6 characters");
-            return;
-        }
-
-        if (!password.equals(confirmPassword)) {
-            showError("Passwords do not match");
-            return;
-        }
-
-        progressBar.setVisibility(View.VISIBLE);
-        buttonRegister.setEnabled(false);
-        textViewError.setVisibility(View.GONE);
-
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<LoginResponse> call = apiService.register(new RegisterRequest(name, email, password, confirmPassword));
-
-        call.enqueue(new Callback<LoginResponse>() {
-            @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                progressBar.setVisibility(View.GONE);
-                buttonRegister.setEnabled(true);
-
-                if (response.isSuccessful() && response.body() != null) {
-                    LoginResponse registerResponse = response.body();
-
-                    if (registerResponse.isSuccess() && registerResponse.getData() != null) {
-                        String token = registerResponse.getData().getTokenType() + " " + registerResponse.getData().getAccessToken();
-                        LoginResponse.User user = registerResponse.getData().getUser();
-
-                        // Save user data to session
-                        sessionManager.saveToken(token);
-                        sessionManager.saveUserId(user.getId());
-                        sessionManager.saveUserData(
-                                user.getName(),
-                                user.getEmail(),
-                                user.getUserType(),
-                                user.isStudent(),
-                                user.isFaculty()
-                        );
-
-                        // Save user details if available
-                        if (user.getDetails() != null) {
-                            sessionManager.saveUserDetails(user.getDetails());
-                        }
-
-                        if (user.getRoles() != null) {
-                            sessionManager.saveUserRoles(user.getRoles());
-                        }
-
-                        Toast.makeText(RegisterActivity.this,
-                                "Registration successful! Welcome " + user.getName(),
-                                Toast.LENGTH_SHORT).show();
-
-                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-
-                    } else {
-                        String errorMessage = registerResponse.getMessage() != null ?
-                                registerResponse.getMessage() : "Registration failed";
-                        showError(errorMessage);
-                    }
-                } else {
-                    // Handle specific error messages from server
-                    switch (response.code()) {
-                        case 422:
-                            showError("Email already exists. Please use a different email.");
-                            break;
-                        case 400:
-                            showError("Bad request. Please check your input.");
-                            break;
-                        case 500:
-                            showError("Server error. Please try again later.");
-                            break;
-                        default:
-                            showError("Registration failed. Please try again.");
-                            break;
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                progressBar.setVisibility(View.GONE);
-                buttonRegister.setEnabled(true);
-                showError("Network error: " + t.getMessage());
-            }
-        });
-    }
+//    private void registerUser() {
+//        String name = editTextName.getText().toString().trim();
+//        String email = editTextEmail.getText().toString().trim();
+//        String password = editTextPassword.getText().toString().trim();
+//        String confirmPassword = editTextConfirmPassword.getText().toString().trim();
+//
+//        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+//            showError("Please fill all fields");
+//            return;
+//        }
+//
+//        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+//            showError("Invalid email address");
+//            return;
+//        }
+//
+//        if (password.length() < 6) {
+//            showError("Password must be at least 6 characters");
+//            return;
+//        }
+//
+//        if (!password.equals(confirmPassword)) {
+//            showError("Passwords do not match");
+//            return;
+//        }
+//
+//        progressBar.setVisibility(View.VISIBLE);
+//        buttonRegister.setEnabled(false);
+//        textViewError.setVisibility(View.GONE);
+//
+//        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+//        Call<LoginResponse> call = apiService.register(new RegisterRequest(name, email, password, confirmPassword));
+//
+//        call.enqueue(new Callback<LoginResponse>() {
+//            @Override
+//            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+//                progressBar.setVisibility(View.GONE);
+//                buttonRegister.setEnabled(true);
+//
+//                if (response.isSuccessful() && response.body() != null) {
+//                    LoginResponse registerResponse = response.body();
+//
+//                    if (registerResponse.isSuccess() && registerResponse.getData() != null) {
+//                        String token = registerResponse.getData().getTokenType() + " " + registerResponse.getData().getAccessToken();
+//                        LoginResponse.User user = registerResponse.getData().getUser();
+//
+//                        // Save user data to session
+//                        sessionManager.saveToken(token);
+//                        sessionManager.saveUserId(user.getId());
+//                        sessionManager.saveUserData(
+//                                user.getName(),
+//                                user.getEmail(),
+//                                user.getUserType(),
+//                                user.isStudent(),
+//                                user.isFaculty()
+//                        );
+//
+//                        // Save user details if available
+//                        if (user.getDetails() != null) {
+//                            sessionManager.saveUserDetails(user.getDetails());
+//                        }
+//
+//                        if (user.getRoles() != null) {
+//                            sessionManager.saveUserRoles(user.getRoles());
+//                        }
+//
+//                        Toast.makeText(RegisterActivity.this,
+//                                "Registration successful! Welcome " + user.getName(),
+//                                Toast.LENGTH_SHORT).show();
+//
+//                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+//                        startActivity(intent);
+//                        finish();
+//
+//                    } else {
+//                        String errorMessage = registerResponse.getMessage() != null ?
+//                                registerResponse.getMessage() : "Registration failed";
+//                        showError(errorMessage);
+//                    }
+//                } else {
+//                    // Handle specific error messages from server
+//                    switch (response.code()) {
+//                        case 422:
+//                            showError("Email already exists. Please use a different email.");
+//                            break;
+//                        case 400:
+//                            showError("Bad request. Please check your input.");
+//                            break;
+//                        case 500:
+//                            showError("Server error. Please try again later.");
+//                            break;
+//                        default:
+//                            showError("Registration failed. Please try again.");
+//                            break;
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<LoginResponse> call, Throwable t) {
+//                progressBar.setVisibility(View.GONE);
+//                buttonRegister.setEnabled(true);
+//                showError("Network error: " + t.getMessage());
+//            }
+//        });
+//    }
 
     private void showError(String message) {
         textViewError.setText(message);

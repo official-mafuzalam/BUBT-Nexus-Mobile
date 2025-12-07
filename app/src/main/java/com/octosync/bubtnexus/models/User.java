@@ -1,48 +1,87 @@
 package com.octosync.bubtnexus.models;
 
+import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class User {
+    @SerializedName("id")
     private int id;
+
+    @SerializedName("name")
     private String name;
+
+    @SerializedName("email")
     private String email;
-    private String email_verified_at;
+
+    @SerializedName("email_verified_at")
+    private String emailVerifiedAt;
+
+    @SerializedName("status")
     private String status;
-    private String last_seen_at;
-    private String online_status;
-    private String last_seen_text;
-    private LastSeenDetailed last_seen_detailed;
-    private String user_type;
-    private boolean is_student;
-    private boolean is_faculty;
-    private String created_at;
-    private String updated_at;
-    private UserDetails details; // Changed from Object to UserDetails
+
+    @SerializedName("last_seen_at")
+    private String lastSeenAt;
+
+    @SerializedName("online_status")
+    private String onlineStatus;
+
+    @SerializedName("last_seen_text")
+    private String lastSeenText;
+
+    @SerializedName("last_seen_detailed")
+    private LastSeenDetailed lastSeenDetailed;
+
+    @SerializedName("user_type")
+    private String userType;
+
+    @SerializedName("is_student")
+    private boolean isStudent;
+
+    @SerializedName("is_faculty")
+    private boolean isFaculty;
+
+    @SerializedName("created_at")
+    private String createdAt;
+
+    @SerializedName("updated_at")
+    private String updatedAt;
+
+    @SerializedName("details")
+    private UserDetails details;
+
+    @SerializedName("roles")
     private List<String> roles;
+
+    @SerializedName("permissions")
     private List<String> permissions;
 
     // Getters
     public int getId() { return id; }
     public String getName() { return name; }
     public String getEmail() { return email; }
-    public String getEmailVerifiedAt() { return email_verified_at; }
+    public String getEmailVerifiedAt() { return emailVerifiedAt; }
     public String getStatus() { return status; }
-    public String getLastSeenAt() { return last_seen_at; }
-    public String getOnlineStatus() { return online_status; }
-    public String getLastSeenText() { return last_seen_text; }
-    public LastSeenDetailed getLastSeenDetailed() { return last_seen_detailed; }
-    public String getUserType() { return user_type; }
-    public boolean isStudent() { return is_student; }
-    public boolean isFaculty() { return is_faculty; }
-    public String getCreatedAt() { return created_at; }
-    public String getUpdatedAt() { return updated_at; }
-    public UserDetails getDetails() { return details; } // Updated getter
+    public String getLastSeenAt() { return lastSeenAt; }
+    public String getOnlineStatus() { return onlineStatus; }
+    public String getLastSeenText() { return lastSeenText; }
+    public LastSeenDetailed getLastSeenDetailed() { return lastSeenDetailed; }
+    public String getUserType() { return userType; }
+    public boolean isStudent() { return isStudent; }
+    public boolean isFaculty() { return isFaculty; }
+    public String getCreatedAt() { return createdAt; }
+    public String getUpdatedAt() { return updatedAt; }
+    public UserDetails getDetails() { return details; }
     public List<String> getRoles() { return roles; }
     public List<String> getPermissions() { return permissions; }
 
     public static class LastSeenDetailed {
+        @SerializedName("text")
         private String text;
+
+        @SerializedName("icon")
         private String icon;
+
+        @SerializedName("color")
         private String color;
 
         public String getText() { return text; }
@@ -50,47 +89,90 @@ public class User {
         public String getColor() { return color; }
     }
 
-    // UserDetails inner class
     public static class UserDetails {
+        @SerializedName("id")
         private int id;
-        private int user_id;
+
+        @SerializedName("user_id")
+        private int userId;
+
+        @SerializedName("is_verified")
+        private String isVerified;
+
+        @SerializedName("semester")
         private String semester;
-        private String intake;
-        private String program;
-        private String student_id;
-        private Double cgpa;
+
+        @SerializedName("intake")
+        private int intake;
+
+        @SerializedName("section")
+        private int section;
+
+        @SerializedName("student_id")
+        private String studentId;
+
+        @SerializedName("cgpa")
+        private String cgpa;
+
+        @SerializedName("department")
         private String department;
-        private String faculty_id;
+
+        @SerializedName("faculty_code")
+        private String facultyCode;
+
+        @SerializedName("designation")
         private String designation;
-        private String office_room;
-        private String office_hours;
+
+        @SerializedName("phone")
         private String phone;
-        private String address;
-        private String date_of_birth;
-        private String emergency_contact;
-        private String profile_picture;
-        private String created_at;
-        private String updated_at;
+
+        @SerializedName("profile_picture")
+        private String profilePicture;
+
+        @SerializedName("created_at")
+        private String createdAt;
+
+        @SerializedName("updated_at")
+        private String updatedAt;
+
+        @SerializedName("user_type")
+        private String userType;
+
+        @SerializedName("program")
+        private Program program;  // Added Program object
 
         // Getters
         public int getId() { return id; }
-        public int getUserId() { return user_id; }
+        public int getUserId() { return userId; }
+        public String getIsVerified() { return isVerified; }
         public String getSemester() { return semester; }
-        public String getIntake() { return intake; }
-        public String getProgram() { return program; }
-        public String getStudentId() { return student_id; }
-        public Double getCgpa() { return cgpa; }
+        public int getIntake() { return intake; }
+        public int getSection() { return section; }
+        public String getStudentId() { return studentId; }
+        public String getCgpa() { return cgpa; }
         public String getDepartment() { return department; }
-        public String getFacultyId() { return faculty_id; }
+        public String getFacultyCode() { return facultyCode; }
         public String getDesignation() { return designation; }
-        public String getOfficeRoom() { return office_room; }
-        public String getOfficeHours() { return office_hours; }
         public String getPhone() { return phone; }
-        public String getAddress() { return address; }
-        public String getDateOfBirth() { return date_of_birth; }
-        public String getEmergencyContact() { return emergency_contact; }
-        public String getProfilePicture() { return profile_picture; }
-        public String getCreatedAt() { return created_at; }
-        public String getUpdatedAt() { return updated_at; }
+        public String getProfilePicture() { return profilePicture; }
+        public String getCreatedAt() { return createdAt; }
+        public String getUpdatedAt() { return updatedAt; }
+        public String getUserType() { return userType; }
+        public Program getProgram() { return program; }  // Getter for program
+    }
+
+    public static class Program {
+        @SerializedName("id")
+        private int id;
+
+        @SerializedName("name")
+        private String name;
+
+        @SerializedName("code")
+        private String code;
+
+        public int getId() { return id; }
+        public String getName() { return name; }
+        public String getCode() { return code; }
     }
 }
