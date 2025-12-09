@@ -179,8 +179,9 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Intake -->
+                <!-- Intake (Student only) -->
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/intakeLayout"
                     style="@style/TextInputLayoutStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -201,8 +202,9 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Section -->
+                <!-- Section (Student only) -->
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/sectionLayout"
                     style="@style/TextInputLayoutStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -223,8 +225,9 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- CGPA -->
+                <!-- CGPA (Student only) -->
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/cgpaLayout"
                     style="@style/TextInputLayoutStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -245,84 +248,74 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-
-                <!-- Semester -->
-<!--                <TextView-->
-<!--                    android:id="@+id/tvSemesterLabel"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginBottom="4dp"-->
-<!--                    android:fontFamily="sans-serif-medium"-->
-<!--                    android:text="Semester"-->
-<!--                    android:textColor="?android:attr/textColorPrimary"-->
-<!--                    android:textSize="14sp" />-->
-
-<!--                <com.google.android.material.textfield.TextInputLayout-->
-<!--                    style="@style/TextInputLayoutStyle"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginBottom="16dp"-->
-<!--                    app:boxBackgroundMode="outline"-->
-<!--                    app:boxStrokeColor="?attr/colorOnSurfaceVariant"-->
-<!--                    app:hintTextColor="?attr/colorOnSurfaceVariant">-->
-
-<!--                    <AutoCompleteTextView-->
-<!--                        android:id="@+id/etSemester"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:clickable="true"-->
-<!--                        android:focusable="false"-->
-<!--                        android:fontFamily="sans-serif"-->
-<!--                        android:hint="Select Semester"-->
-<!--                        android:inputType="none"-->
-<!--                        android:textColor="?android:attr/textColorPrimary"-->
-<!--                        android:textSize="16sp" />-->
-
-<!--                </com.google.android.material.textfield.TextInputLayout>-->
-
-
-                <!-- Department -->
-
+                <!-- Semester (Student only) -->
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/semesterLayout"
                     style="@style/TextInputLayoutStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    android:hint="Semester"
                     app:boxBackgroundMode="outline"
                     app:boxStrokeColor="?attr/colorOnSurfaceVariant"
+                    app:endIconMode="dropdown_menu"
+                    app:endIconTint="?attr/colorOnSurfaceVariant"
                     app:hintTextColor="?attr/colorOnSurfaceVariant">
 
-                    <AutoCompleteTextView
-                        android:id="@+id/etDepartment"
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/etSemester"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="false"
-                        android:fontFamily="sans-serif"
-                        android:hint="Select Department"
+                        android:minHeight="56dp"
                         android:inputType="none"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
                         android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-
-                <!-- Faculty Code -->
-                <TextView
-                    android:id="@+id/tvFacultyCodeLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Faculty Code"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="14sp" />
-
+                <!-- Department (Faculty only) -->
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/departmentLayout"
                     style="@style/TextInputLayoutStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    android:hint="Department"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="?attr/colorOnSurfaceVariant"
+                    app:endIconMode="dropdown_menu"
+                    app:endIconTint="?attr/colorOnSurfaceVariant"
+                    app:hintTextColor="?attr/colorOnSurfaceVariant">
+
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/etDepartment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="56dp"
+                        android:inputType="none"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Faculty Code (Faculty only) -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/facultyCodeLayout"
+                    style="@style/TextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:hint="Faculty Code"
                     app:boxBackgroundMode="outline"
                     app:boxStrokeColor="?attr/colorOnSurfaceVariant"
                     app:hintTextColor="?attr/colorOnSurfaceVariant">
@@ -338,37 +331,33 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Designation -->
-                <TextView
-                    android:id="@+id/tvDesignationLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Designation"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="14sp" />
-
+                <!-- Designation (Faculty only) -->
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/designationLayout"
                     style="@style/TextInputLayoutStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    android:hint="Designation"
                     app:boxBackgroundMode="outline"
                     app:boxStrokeColor="?attr/colorOnSurfaceVariant"
+                    app:endIconMode="dropdown_menu"
+                    app:endIconTint="?attr/colorOnSurfaceVariant"
                     app:hintTextColor="?attr/colorOnSurfaceVariant">
 
-                    <AutoCompleteTextView
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/etDesignation"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="false"
-                        android:fontFamily="sans-serif"
-                        android:hint="Select Designation"
+                        android:minHeight="56dp"
                         android:inputType="none"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
                         android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 

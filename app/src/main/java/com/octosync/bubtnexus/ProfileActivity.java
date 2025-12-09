@@ -297,53 +297,87 @@ public class ProfileActivity extends AppCompatActivity {
             public void onResponse(Call<SemesterOptionsResponse> call, Response<SemesterOptionsResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     SemesterOptionsResponse semesterResponse = response.body();
-                    if (semesterResponse.isSuccess() && semesterResponse.getData() != null) {
-                        Map<String, String> semesterMap = semesterResponse.getData();
+                    if (semesterResponse.isSuccess()) {
+                        // Use the helper method to get the map
+                        Map<String, String> semesterMap = semesterResponse.getSemesterMap();
 
-                        // Convert map to list of SemesterOption objects
-                        List<SemesterOption> semesterOptions = new ArrayList<>();
-                        List<String> semesterNames = new ArrayList<>();
+                        // Check if map is not empty
+                        if (semesterMap != null && !semesterMap.isEmpty()) {
+                            // Convert map to list of SemesterOption objects
+                            List<SemesterOption> semesterOptions = new ArrayList<>();
+                            List<String> semesterNames = new ArrayList<>();
 
-                        for (Map.Entry<String, String> entry : semesterMap.entrySet()) {
-                            String semesterName = entry.getKey();
-                            String semesterCode = entry.getValue();
+                            for (Map.Entry<String, String> entry : semesterMap.entrySet()) {
+                                String semesterName = entry.getKey();
+                                String semesterCode = entry.getValue();
 
-                            // Create SemesterOption object
-                            SemesterOption option = new SemesterOption(semesterName, semesterCode);
-                            semesterOptions.add(option);
+                                // Create SemesterOption object
+                                SemesterOption option = new SemesterOption(semesterName, semesterCode);
+                                semesterOptions.add(option);
 
-                            // Add to names list for spinner
-                            semesterNames.add(semesterName);
-                        }
-
-                        // Get semester code from session
-                        String semesterCodeFromSession = sessionManager.getSemester();
-                        String semesterNameToShow = "N/A"; // Default value
-
-                        // Find the semester name that matches the code
-                        for (SemesterOption option : semesterOptions) {
-                            if (option.getCode().equals(semesterCodeFromSession)) {
-                                semesterNameToShow = option.getName();
-                                break;
+                                // Add to names list for spinner
+                                semesterNames.add(semesterName);
                             }
-                        }
-                        if (tvSemester != null) {
-                            tvSemester.setText(semesterNameToShow);
+
+                            // Get semester code from session
+                            String semesterCodeFromSession = sessionManager.getSemester();
+                            String semesterNameToShow = "N/A"; // Default value
+
+                            // Find the semester name that matches the code
+                            if (semesterCodeFromSession != null) {
+                                for (SemesterOption option : semesterOptions) {
+                                    if (option.getCode().equals(semesterCodeFromSession)) {
+                                        semesterNameToShow = option.getName();
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // Update UI on main thread
+                            String finalSemesterNameToShow = semesterNameToShow;
+                            runOnUiThread(() -> {
+                                if (tvSemester != null) {
+                                    tvSemester.setText(finalSemesterNameToShow);
+                                }
+                            });
+                        } else {
+                            Log.e("SemesterData", "Semester map is empty");
+                            runOnUiThread(() -> {
+                                if (tvSemester != null) {
+                                    tvSemester.setText("N/A");
+                                }
+                            });
                         }
                     } else {
-                        Log.e("SemesterData", "Response not successful or data is null");
+                        Log.e("SemesterData", "Response not successful");
+                        runOnUiThread(() -> {
+                            if (tvSemester != null) {
+                                tvSemester.setText("N/A");
+                            }
+                        });
                     }
                 } else {
                     Log.e("SemesterData", "Response not successful: " + response.code());
+                    runOnUiThread(() -> {
+                        if (tvSemester != null) {
+                            tvSemester.setText("N/A");
+                        }
+                    });
                 }
             }
 
             @Override
             public void onFailure(Call<SemesterOptionsResponse> call, Throwable t) {
                 Log.e("SemesterData", "Failed to load semesters: " + t.getMessage());
+                runOnUiThread(() -> {
+                    if (tvSemester != null) {
+                        tvSemester.setText("N/A");
+                    }
+                });
             }
         });
     }
+
     private void loadProfilePicture() {
         try {
             // Get profile picture from session manager

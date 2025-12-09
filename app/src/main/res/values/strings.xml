@@ -12,6 +12,11 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <string name="select_department">Select Department</string>
+    <string name="select_program">Select Program</string>
+    <string name="select_semester">Select Semester</string>
+    <string name="select_designation">Select Designation</string>
+
     <!-- Auth Text Input Style -->
     <style name="AuthTextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxBackgroundColor">@color/white</item>

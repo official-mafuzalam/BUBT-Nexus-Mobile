@@ -62,14 +62,13 @@
                 <!-- Email Input -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/emailLayout"
-                    style="@style/AuthTextInput"
+                    style="@style/TextInputLayoutStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginBottom="16dp"
+                    app:boxBackgroundMode="outline"
                     app:boxStrokeColor="?attr/colorOnSurfaceVariant"
-                    app:hintTextColor="?attr/colorOnSurfaceVariant"
-                    app:startIconDrawable="@drawable/ic_email"
-                    app:startIconTint="?attr/colorOnSurfaceVariant">
+                    app:hintTextColor="?attr/colorOnSurfaceVariant">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextEmail"
@@ -86,16 +85,13 @@
                 <!-- Password Input -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/passwordLayout"
-                    style="@style/AuthTextInput"
+                    style="@style/TextInputLayoutStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="30dp"
+                    android:layout_marginBottom="16dp"
+                    app:boxBackgroundMode="outline"
                     app:boxStrokeColor="?attr/colorOnSurfaceVariant"
-                    app:endIconMode="password_toggle"
-                    app:endIconTint="?attr/colorOnSurfaceVariant"
-                    app:hintTextColor="?attr/colorOnSurfaceVariant"
-                    app:startIconDrawable="@drawable/ic_lock"
-                    app:startIconTint="?attr/colorOnSurfaceVariant">
+                    app:hintTextColor="?attr/colorOnSurfaceVariant">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextPassword"

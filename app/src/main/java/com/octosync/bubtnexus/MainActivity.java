@@ -20,6 +20,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.octosync.bubtnexus.models.NoticesResponse;
 import com.octosync.bubtnexus.models.SemesterOption;
 import com.octosync.bubtnexus.models.SemesterOptionsResponse;
+import com.octosync.bubtnexus.models.User;
 import com.octosync.bubtnexus.models.UserResponse;
 import com.octosync.bubtnexus.network.ApiClient;
 import com.octosync.bubtnexus.network.ApiService;
@@ -383,7 +384,6 @@ public class MainActivity extends AppCompatActivity {
                         com.octosync.bubtnexus.models.User user = userResponse.getData().getUser();
                         String currentUserName = sessionManager.getUserName();
                         String newUserName = user.getName();
-                        String userType = user.getUserType();
 
                         // Update if user data changed or not stored
                         if (currentUserName == null || !currentUserName.equals(newUserName)) {
@@ -401,7 +401,30 @@ public class MainActivity extends AppCompatActivity {
 
                             // Update user details if available
                             if (user.getDetails() != null) {
-                                sessionManager.saveUserDetails(user.getDetails());
+                                User.UserDetails details = user.getDetails();
+
+                                // Save individual detail fields
+                                sessionManager.saveUserDetails(
+                                        details.getPhone() != null ? details.getPhone() : "",
+                                        details.getStudentId() != null ? details.getStudentId() : "",
+                                        details.getFacultyCode() != null ? details.getFacultyCode() : "",
+                                        details.getDepartment() != null ? details.getDepartment() : "",
+                                        details.getDesignation() != null ? details.getDesignation() : "",
+                                        details.getSemester() != null ? details.getSemester() : "",
+                                        details.getIntake(),  // int cannot be null, use value directly
+                                        details.getSection(), // int cannot be null, use value directly
+                                        details.getCgpa() != null ? details.getCgpa() : "",
+                                        details.getProfilePicture() != null ? details.getProfilePicture() : ""
+                                );
+
+                                // Save program info if available
+                                if (details.getProgram() != null) {
+                                    sessionManager.saveProgramInfo(
+                                            details.getProgram().getId(),
+                                            details.getProgram().getName(),
+                                            details.getProgram().getCode()
+                                    );
+                                }
                             }
 
                             // Update roles if available
@@ -454,6 +477,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     showToast(errorMessage);
                 }
+
             }
 
             @Override
@@ -475,5 +499,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 }

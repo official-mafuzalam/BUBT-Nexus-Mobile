@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.octosync.bubtnexus.models.LoginRequest;
 import com.octosync.bubtnexus.models.LoginResponse;
-import com.octosync.bubtnexus.models.User;
 import com.octosync.bubtnexus.network.ApiClient;
 import com.octosync.bubtnexus.network.ApiService;
 import com.octosync.bubtnexus.utils.SessionManager;
@@ -105,16 +104,13 @@ public class LoginActivity extends AppCompatActivity {
                     LoginResponse loginResponse = response.body();
 
                     if (loginResponse.isSuccess() && loginResponse.getData() != null) {
-                        // Construct Bearer token correctly
-                        String accessToken = loginResponse.getData().getAccessToken();
-                        String tokenType = loginResponse.getData().getTokenType();
-                        String token = tokenType + " " + accessToken;
+                        LoginResponse.Data data = loginResponse.getData();
 
-                        com.octosync.bubtnexus.models.User user = loginResponse.getData().getUser();
+                        // Construct token
+                        String token = data.getTokenType() + " " + data.getAccessToken();
 
-                        // Get user type from response
-                        String userType = loginResponse.getUserType() != null ?
-                                loginResponse.getUserType() : user.getUserType();
+                        // Get user from data
+                        LoginResponse.User user = data.getUser();
 
                         // Save user data to session
                         sessionManager.saveToken(token);
@@ -122,12 +118,12 @@ public class LoginActivity extends AppCompatActivity {
                         sessionManager.saveUserData(
                                 user.getName(),
                                 user.getEmail(),
-                                userType,
+                                user.getUserType(),
                                 user.isStudent(),
                                 user.isFaculty()
                         );
 
-                        // CRITICAL: Save user details (this was commented out!)
+                        // Save user details if available
                         if (user.getDetails() != null) {
                             sessionManager.saveUserDetails(user.getDetails());
 
@@ -142,33 +138,33 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d(TAG, "User Details is null!");
                         }
 
+                        // Save user roles if available
                         if (user.getRoles() != null && !user.getRoles().isEmpty()) {
                             sessionManager.saveUserRoles(user.getRoles());
                         }
 
                         // Debug log to verify all data is saved
-//                        Log.d(TAG, "=== After Login - Session Data ===");
-//                        Log.d(TAG, "Token: " + (sessionManager.getToken() != null ? "Exists" : "Null"));
-//                        Log.d(TAG, "User ID: " + sessionManager.getUserId());
-//                        Log.d(TAG, "User Name: " + sessionManager.getUserName());
-//                        Log.d(TAG, "User Email: " + sessionManager.getUserEmail());
-//                        Log.d(TAG, "User Type: " + sessionManager.getUserType());
-//                        Log.d(TAG, "Is Student: " + sessionManager.isStudent());
-//                        Log.d(TAG, "Is Faculty: " + sessionManager.isFaculty());
-//                        Log.d(TAG, "Student ID: " + sessionManager.getStudentId());
-//                        Log.d(TAG, "Semester: " + sessionManager.getSemester());
-//                        Log.d(TAG, "Program Code: " + sessionManager.getProgramCode());
-//                        Log.d(TAG, "Program Name: " + sessionManager.getProgramName());
-//                        Log.d(TAG, "Intake: " + sessionManager.getIntake());
-//                        Log.d(TAG, "Section: " + sessionManager.getSection());
-//                        Log.d(TAG, "CGPA: " + sessionManager.getCgpa());
+                        Log.d(TAG, "=== After Login - Session Data ===");
+                        Log.d(TAG, "Token: " + (sessionManager.getToken() != null ? "Exists" : "Null"));
+                        Log.d(TAG, "User ID: " + sessionManager.getUserId());
+                        Log.d(TAG, "User Name: " + sessionManager.getUserName());
+                        Log.d(TAG, "User Email: " + sessionManager.getUserEmail());
+                        Log.d(TAG, "User Type: " + sessionManager.getUserType());
+                        Log.d(TAG, "Is Student: " + sessionManager.isStudent());
+                        Log.d(TAG, "Is Faculty: " + sessionManager.isFaculty());
+                        Log.d(TAG, "Student ID: " + sessionManager.getStudentId());
+                        Log.d(TAG, "Semester: " + sessionManager.getSemester());
+                        Log.d(TAG, "Program Code: " + sessionManager.getProgramCode());
+                        Log.d(TAG, "Program Name: " + sessionManager.getProgramName());
+                        Log.d(TAG, "Intake: " + sessionManager.getIntake());
+                        Log.d(TAG, "Section: " + sessionManager.getSection());
+                        Log.d(TAG, "CGPA: " + sessionManager.getCgpa());
 
                         Toast.makeText(LoginActivity.this,
                                 "Welcome " + user.getName(),
                                 Toast.LENGTH_SHORT).show();
 
-                        // Pass user type to MainActivity
-                        redirectToMainActivity(userType);
+                        redirectToMainActivity();
 
                     } else {
                         String errorMessage = loginResponse.getMessage() != null ?
@@ -200,12 +196,6 @@ public class LoginActivity extends AppCompatActivity {
                 showError("Network error: " + t.getMessage());
             }
         });
-    }
-
-    private void redirectToMainActivity(String userType) {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
-        finish();
     }
 
     private void showError(String message) {

@@ -3,8 +3,6 @@ package com.octosync.bubtnexus.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.octosync.bubtnexus.models.User;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,7 +62,7 @@ public class SessionManager {
         editor.apply();
     }
 
-    public void saveUserDetails(User.UserDetails details) {
+    public void saveUserDetails(com.octosync.bubtnexus.models.LoginResponse.Details details) {
         if (details != null) {
             editor.putString(KEY_IS_VERIFIED, details.getIsVerified());
             editor.putString(KEY_SEMESTER, details.getSemester());
@@ -87,6 +85,31 @@ public class SessionManager {
 
             editor.apply();
         }
+    }
+
+    // Add this method to SessionManager.java
+    public void saveUserDetails(String phone, String studentId, String facultyCode,
+                                String department, String designation, String semester,
+                                int intake, int section, String cgpa, String profilePicture) {
+        editor.putString(KEY_PHONE, phone);
+        editor.putString(KEY_STUDENT_ID, studentId);
+        editor.putString(KEY_FACULTY_CODE, facultyCode);
+        editor.putString(KEY_DEPARTMENT, department);
+        editor.putString(KEY_DESIGNATION, designation);
+        editor.putString(KEY_SEMESTER, semester);
+        editor.putInt(KEY_INTAKE, intake);
+        editor.putInt(KEY_SECTION, section);
+        editor.putString(KEY_CGPA, cgpa);
+        editor.putString(KEY_PROFILE_PICTURE, profilePicture);
+        editor.apply();
+    }
+
+    // Add this method to SessionManager.java
+    public void saveProgramInfo(int programId, String programName, String programCode) {
+        editor.putInt(KEY_PROGRAM_ID, programId);
+        editor.putString(KEY_PROGRAM_NAME, programName);
+        editor.putString(KEY_PROGRAM_CODE, programCode);
+        editor.apply();
     }
 
     // Getters

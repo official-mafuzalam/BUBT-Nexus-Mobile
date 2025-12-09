@@ -6,7 +6,6 @@ import retrofit2.Call;
 import retrofit2.http.*;
 
 public interface ApiService {
-    // Existing methods
     @POST("login")
     Call<LoginResponse> login(@Body LoginRequest loginRequest);
 

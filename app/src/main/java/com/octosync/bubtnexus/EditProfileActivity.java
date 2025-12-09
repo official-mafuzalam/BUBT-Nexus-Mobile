@@ -1,33 +1,34 @@
 package com.octosync.bubtnexus;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+import com.octosync.bubtnexus.models.ListResponse;
 import com.octosync.bubtnexus.models.ProfileUpdateRequest;
 import com.octosync.bubtnexus.models.ProfileUpdateResponse;
+import com.octosync.bubtnexus.models.SemesterOptionsResponse;
 import com.octosync.bubtnexus.models.User;
 import com.octosync.bubtnexus.network.ApiClient;
 import com.octosync.bubtnexus.network.ApiService;
 import com.octosync.bubtnexus.utils.SessionManager;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,9 +36,9 @@ import retrofit2.Response;
 
 public class EditProfileActivity extends AppCompatActivity {
     private static final String TAG = "EditProfileActivity";
-    private static final int PICK_IMAGE_REQUEST = 1;
 
-    private EditText etName, etEmail, etPhone, etSection, etFacultyCode, etDepartment, etSemester, etIntake, etDesignation, etCgpa;
+    private EditText etName, etEmail, etPhone, etSection, etFacultyCode, etIntake, etCgpa;
+    private MaterialAutoCompleteTextView etSemester, etDepartment, etDesignation;
     private ImageView ivProfile;
     private MaterialButton btnSave, btnCancel;
     private ImageButton btnBack;
@@ -45,8 +46,16 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private SessionManager sessionManager;
     private ApiService apiService;
-    private Bitmap selectedBitmap;
-    private Uri selectedImageUri;
+
+    // Data for dropdowns
+    private Map<String, String> semesterMap = new HashMap<>();
+    private List<String> departmentList = new ArrayList<>();
+    private List<String> designationList = new ArrayList<>();
+
+    // Selected values
+    private String selectedSemesterValue = null;
+    private String selectedDepartment = null;
+    private String selectedDesignation = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +69,7 @@ public class EditProfileActivity extends AppCompatActivity {
         setupClickListeners();
         loadCurrentUserData();
         setupFieldsByUserType();
+        loadDropdownData();
     }
 
     private void initializeViews() {
@@ -69,11 +79,13 @@ public class EditProfileActivity extends AppCompatActivity {
         etPhone = findViewById(R.id.etPhone);
         etSection = findViewById(R.id.etSection);
         etFacultyCode = findViewById(R.id.etFacultyCode);
-        etDepartment = findViewById(R.id.etDepartment);
-//        etSemester = findViewById(R.id.etSemester);
         etIntake = findViewById(R.id.etIntake);
-        etDesignation = findViewById(R.id.etDesignation);
         etCgpa = findViewById(R.id.etCgpa);
+
+        // MaterialAutoCompleteTextViews
+        etSemester = findViewById(R.id.etSemester);
+        etDepartment = findViewById(R.id.etDepartment);
+        etDesignation = findViewById(R.id.etDesignation);
 
         // Image and Buttons
         ivProfile = findViewById(R.id.ivProfile);
@@ -87,58 +99,47 @@ public class EditProfileActivity extends AppCompatActivity {
         boolean isStudent = sessionManager.isStudent();
         boolean isFaculty = sessionManager.isFaculty();
 
-        // Find label views
-        View tvFacultyCodeLabel = findViewById(R.id.tvFacultyCodeLabel);
-//        View tvSemesterLabel = findViewById(R.id.tvSemesterLabel);
-        View tvDesignationLabel = findViewById(R.id.tvDesignationLabel);
+        // Find layouts
+        View intakeLayout = findViewById(R.id.intakeLayout);
+        View sectionLayout = findViewById(R.id.sectionLayout);
+        View cgpaLayout = findViewById(R.id.cgpaLayout);
+        View semesterLayout = findViewById(R.id.semesterLayout);
+        View departmentLayout = findViewById(R.id.departmentLayout);
+        View facultyCodeLayout = findViewById(R.id.facultyCodeLayout);
+        View designationLayout = findViewById(R.id.designationLayout);
 
         // Show/hide student fields
-        if (etSection != null) {
-            etSection.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+        if (intakeLayout != null) {
+            intakeLayout.setVisibility(isStudent ? View.VISIBLE : View.GONE);
         }
-        if (etSection != null) {
-            etSection.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+        if (sectionLayout != null) {
+            sectionLayout.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+        }
+        if (cgpaLayout != null) {
+            cgpaLayout.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+        }
+        if (semesterLayout != null) {
+            semesterLayout.setVisibility(isStudent ? View.VISIBLE : View.GONE);
         }
 
         // Show/hide faculty fields
-        if (etFacultyCode != null) {
-            etFacultyCode.setVisibility(isFaculty ? View.VISIBLE : View.GONE);
+        if (departmentLayout != null) {
+            departmentLayout.setVisibility(isFaculty ? View.VISIBLE : View.GONE);
         }
-        if (tvFacultyCodeLabel != null) {
-            tvFacultyCodeLabel.setVisibility(isFaculty ? View.VISIBLE : View.GONE);
+        if (facultyCodeLayout != null) {
+            facultyCodeLayout.setVisibility(isFaculty ? View.VISIBLE : View.GONE);
         }
-
-        // Show/hide Department fields
-        if (etDepartment != null) {
-            etDepartment.setVisibility(isFaculty ? View.VISIBLE : View.GONE);
-        }
-
-        // Show/hide semester field (for students)
-//        if (etSemester != null) {
-//            etSemester.setVisibility(isStudent ? View.VISIBLE : View.GONE);
-//        }
-//        if (tvSemesterLabel != null) {
-//            tvSemesterLabel.setVisibility(isStudent ? View.VISIBLE : View.GONE);
-//        }
-
-        // Show/hide CGPA field (for students)
-        if (etCgpa != null) {
-            etCgpa.setVisibility(isStudent ? View.VISIBLE : View.GONE);
-        }
-
-        // Show/hide designation field (for faculty)
-        if (etDesignation != null) {
-            etDesignation.setVisibility(isFaculty ? View.VISIBLE : View.GONE);
-        }
-        if (tvDesignationLabel != null) {
-            tvDesignationLabel.setVisibility(isFaculty ? View.VISIBLE : View.GONE);
+        if (designationLayout != null) {
+            designationLayout.setVisibility(isFaculty ? View.VISIBLE : View.GONE);
         }
     }
 
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
         btnCancel.setOnClickListener(v -> finish());
-        ivProfile.setOnClickListener(v -> openImagePicker());
+        ivProfile.setOnClickListener(v -> {
+            Toast.makeText(this, "Image upload system not yet implemented", Toast.LENGTH_SHORT).show();
+        });
         btnSave.setOnClickListener(v -> updateProfile());
     }
 
@@ -148,25 +149,37 @@ public class EditProfileActivity extends AppCompatActivity {
             etName.setText(sessionManager.getUserName());
             etEmail.setText(sessionManager.getUserEmail());
             etPhone.setText(sessionManager.getPhone() != null ? sessionManager.getPhone() : "");
-            etDepartment.setText(sessionManager.getDepartment() != null ? sessionManager.getDepartment() : "");
-
 
             // Load user type specific data
             if (sessionManager.isStudent()) {
                 String sectionValue = sessionManager.getSection() > 0
                         ? String.valueOf(sessionManager.getSection())
                         : "";
-
                 etSection.setText(sectionValue);
 
-//                etSemester.setText(sessionManager.getSemester() != null ? sessionManager.getSemester() : "");
+                String semester = sessionManager.getSemester();
+                if (semester != null && !semester.isEmpty()) {
+                    etSemester.setText(semester);
+                }
+
                 etCgpa.setText(sessionManager.getCgpa() != null ? sessionManager.getCgpa() : "");
-                etIntake.setText(sessionManager.getIntake() > 0 ? String.valueOf(sessionManager.getIntake()) : "");
+
+                int intake = sessionManager.getIntake();
+                etIntake.setText(intake > 0 ? String.valueOf(intake) : "");
             }
 
             if (sessionManager.isFaculty()) {
                 etFacultyCode.setText(sessionManager.getFacultyCode() != null ? sessionManager.getFacultyCode() : "");
-                etDesignation.setText(sessionManager.getDesignation() != null ? sessionManager.getDesignation() : "");
+
+                String department = sessionManager.getDepartment();
+                if (department != null && !department.isEmpty()) {
+                    etDepartment.setText(department);
+                }
+
+                String designation = sessionManager.getDesignation();
+                if (designation != null && !designation.isEmpty()) {
+                    etDesignation.setText(designation);
+                }
             }
 
         } catch (Exception e) {
@@ -175,8 +188,140 @@ public class EditProfileActivity extends AppCompatActivity {
         }
     }
 
-    private void openImagePicker() {
-            Toast.makeText(this, "Image Upload System added yet", Toast.LENGTH_SHORT).show();
+    private void loadDropdownData() {
+        // Load semesters
+        apiService.getSemesterOptions().enqueue(new Callback<SemesterOptionsResponse>() {
+            @Override
+            public void onResponse(Call<SemesterOptionsResponse> call, Response<SemesterOptionsResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    semesterMap = response.body().getSemesterMap();
+                    setupSemesterAutoComplete();
+
+                    // Set current semester if exists
+                    String currentSemester = sessionManager.getSemester();
+                    if (currentSemester != null && !currentSemester.isEmpty()) {
+                        // Find semester name from code
+                        for (Map.Entry<String, String> entry : semesterMap.entrySet()) {
+                            if (entry.getValue().equals(currentSemester)) {
+                                etSemester.setText(entry.getKey());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SemesterOptionsResponse> call, Throwable t) {
+                Log.e(TAG, "Failed to load semesters: " + t.getMessage());
+            }
+        });
+
+        // Load departments
+        apiService.getDepartments().enqueue(new Callback<ListResponse>() {
+            @Override
+            public void onResponse(Call<ListResponse> call, Response<ListResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    departmentList = response.body().getData();
+                    setupDepartmentAutoComplete();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ListResponse> call, Throwable t) {
+                Log.e(TAG, "Failed to load departments: " + t.getMessage());
+            }
+        });
+
+        // Load designations
+        apiService.getDesignations().enqueue(new Callback<ListResponse>() {
+            @Override
+            public void onResponse(Call<ListResponse> call, Response<ListResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    designationList = response.body().getData();
+                    setupDesignationAutoComplete();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ListResponse> call, Throwable t) {
+                Log.e(TAG, "Failed to load designations: " + t.getMessage());
+            }
+        });
+    }
+
+    private void setupSemesterAutoComplete() {
+        List<String> semesterOptions = new ArrayList<>();
+        semesterOptions.add("Select Semester");
+
+        if (!semesterMap.isEmpty()) {
+            semesterOptions.addAll(semesterMap.keySet());
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, semesterOptions);
+
+        etSemester.setAdapter(adapter);
+
+        etSemester.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0) {
+                    String selectedText = (String) parent.getItemAtPosition(position);
+                    if (semesterMap.containsKey(selectedText)) {
+                        selectedSemesterValue = semesterMap.get(selectedText);
+                    } else {
+                        selectedSemesterValue = selectedText;
+                    }
+                } else {
+                    selectedSemesterValue = null;
+                }
+            }
+        });
+    }
+
+    private void setupDepartmentAutoComplete() {
+        List<String> departments = new ArrayList<>();
+        departments.add("Select Department");
+        departments.addAll(departmentList);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, departments);
+
+        etDepartment.setAdapter(adapter);
+
+        etDepartment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0) {
+                    selectedDepartment = (String) parent.getItemAtPosition(position);
+                } else {
+                    selectedDepartment = null;
+                }
+            }
+        });
+    }
+
+    private void setupDesignationAutoComplete() {
+        List<String> designations = new ArrayList<>();
+        designations.add("Select Designation");
+        designations.addAll(designationList);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, designations);
+
+        etDesignation.setAdapter(adapter);
+
+        etDesignation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0) {
+                    selectedDesignation = (String) parent.getItemAtPosition(position);
+                } else {
+                    selectedDesignation = null;
+                }
+            }
+        });
     }
 
     private void updateProfile() {
@@ -184,7 +329,6 @@ public class EditProfileActivity extends AppCompatActivity {
         String name = etName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
-        String department = etDepartment.getText().toString().trim();
 
         // Basic validation
         if (name.isEmpty()) {
@@ -203,17 +347,19 @@ public class EditProfileActivity extends AppCompatActivity {
         String cgpa = "";
         String intake = "";
         String facultyCode = "";
+        String department = "";
         String designation = "";
 
         if (sessionManager.isStudent()) {
             studentSection = etSection.getText().toString().trim();
-//            semester = etSemester.getText().toString().trim();
+            semester = etSemester.getText().toString().trim();
             cgpa = etCgpa.getText().toString().trim();
             intake = etIntake.getText().toString().trim();
         }
 
         if (sessionManager.isFaculty()) {
             facultyCode = etFacultyCode.getText().toString().trim();
+            department = etDepartment.getText().toString().trim();
             designation = etDesignation.getText().toString().trim();
         }
 
@@ -224,19 +370,28 @@ public class EditProfileActivity extends AppCompatActivity {
         updateRequest.setName(name);
         updateRequest.setEmail(email);
         updateRequest.setPhone(phone.isEmpty() ? null : phone);
-        updateRequest.setDepartment(department.isEmpty() ? null : department);
 
         // Add user type specific fields
         if (sessionManager.isStudent()) {
             updateRequest.setSection(studentSection.isEmpty() ? null : studentSection);
-//            updateRequest.setSemester(semester.isEmpty() ? null : semester);
+
+            // Get semester value from map
+            if (!semester.isEmpty() && !semester.equals("Select Semester")) {
+                if (semesterMap.containsKey(semester)) {
+                    updateRequest.setSemester(semesterMap.get(semester));
+                } else {
+                    updateRequest.setSemester(semester);
+                }
+            }
+
             updateRequest.setCgpa(cgpa.isEmpty() ? null : cgpa);
             updateRequest.setIntake(intake.isEmpty() ? null : intake);
         }
 
         if (sessionManager.isFaculty()) {
             updateRequest.setFacultyCode(facultyCode.isEmpty() ? null : facultyCode);
-            updateRequest.setDesignation(designation.isEmpty() ? null : designation);
+            updateRequest.setDepartment(department.isEmpty() || department.equals("Select Department") ? null : department);
+            updateRequest.setDesignation(designation.isEmpty() || designation.equals("Select Designation") ? null : designation);
         }
 
         String token = sessionManager.getToken();
@@ -304,7 +459,30 @@ public class EditProfileActivity extends AppCompatActivity {
 
             // Update user details if available
             if (user.getDetails() != null) {
-                sessionManager.saveUserDetails(user.getDetails());
+                User.UserDetails details = user.getDetails();
+
+                // Save individual detail fields
+                sessionManager.saveUserDetails(
+                        details.getPhone(),
+                        details.getStudentId(),
+                        details.getFacultyCode(),
+                        details.getDepartment(),
+                        details.getDesignation(),
+                        details.getSemester(),
+                        details.getIntake(),
+                        details.getSection(),
+                        details.getCgpa(),
+                        details.getProfilePicture()
+                );
+
+                // Save program info if available
+                if (details.getProgram() != null) {
+                    sessionManager.saveProgramInfo(
+                            details.getProgram().getId(),
+                            details.getProgram().getName(),
+                            details.getProgram().getCode()
+                    );
+                }
             }
         }
     }
@@ -353,10 +531,6 @@ public class EditProfileActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Clean up bitmap to avoid memory leaks
-        if (selectedBitmap != null && !selectedBitmap.isRecycled()) {
-            selectedBitmap.recycle();
-            selectedBitmap = null;
-        }
+        // Clean up resources if needed
     }
 }
