@@ -2,6 +2,8 @@ package com.octosync.bubtnexus.network;
 
 import com.octosync.bubtnexus.models.*;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -95,4 +97,63 @@ public interface ApiService {
     // Get designation options
     @GET("designations")
     Call<ListResponse> getDesignations();
+
+    // ===== RENT API ENDPOINTS =====
+
+    // List all rents (with optional filters)
+    @GET("/api/rents")
+    Call<RentsResponse> getRents(
+            @Query("category") String category,
+            @Query("location") String location,
+            @Query("available") Boolean available,
+            @Query("min_rent") Integer minRent,
+            @Query("max_rent") Integer maxRent
+    );
+
+    // View single rent post
+    @GET("/api/rents/{id}")
+    Call<RentResponse> getRent(@Path("id") int id);
+
+    // Search rents
+    @GET("/api/rents/search")
+    Call<RentsResponse> searchRents(
+            @Query("q") String query,
+            @Query("category") String category,
+            @Query("location") String location,
+            @Query("available") Boolean available
+    );
+
+    // Create rent post
+    @POST("/api/rents")
+    Call<RentCreateResponse> createRent(
+            @Header("Authorization") String token,
+            @Body RentCreateRequest rentCreateRequest
+    );
+
+    // Update rent post
+    @PUT("/api/rents/{id}")
+    Call<RentUpdateResponse> updateRent(
+            @Header("Authorization") String token,
+            @Path("id") int id,
+            @Body RentUpdateRequest updateRentRequest
+    );
+
+    // Delete rent post
+    @DELETE("/api/rents/{id}")
+    Call<RentDeleteResponse> deleteRent(
+            @Header("Authorization") String token,
+            @Path("id") int id
+    );
+
+    // Set availability
+    @PUT("/api/rents/{id}/availability")
+    Call<RentSetAvailabilityResponse> setAvailability(
+            @Header("Authorization") String token,
+            @Path("id") int id,
+            @Body RentSetAvailabilityRequest setAvailabilityRequest
+    );
+
+    // Get my rent posts
+    @GET("/api/my-rents")
+    Call<List<Rent>> getMyRents(@Header("Authorization") String token);
 }
