@@ -19,6 +19,9 @@
         android:theme="@style/Theme.BUBTNexus"
         tools:targetApi="31">
         <activity
+            android:name=".RentActivity"
+            android:exported="false" />
+        <activity
             android:name=".MapPickerActivity"
             android:exported="false" />
         <activity

@@ -1,6 +1,16 @@
 <resources>
     <string name="app_name">BUBT Nexus</string>
 
+    <!-- Rent Strings -->
+    <string name="price_format">৳ %d</string>
+    <string name="bed_bath_format">%d Bed • %d Bath</string>
+    <string name="available_from">Available from: %s</string>
+
+    <!-- Category Names -->
+    <string name="category_room">Room</string>
+    <string name="category_flat">Flat</string>
+    <string name="category_single_bed">Single Bed</string>
+    <string name="category_sublet">Sublet</string>
 
     <!-- Auth Button Style -->
     <style name="AuthButton">

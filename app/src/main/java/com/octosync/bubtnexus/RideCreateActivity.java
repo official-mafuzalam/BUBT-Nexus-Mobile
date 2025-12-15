@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,6 +40,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class RideCreateActivity extends AppCompatActivity {
+
+    private static final String TAG = "RideCreateActivity";
 
     // UI Components
     private EditText etFromLocation, etToLocation, etTotalSeats, etFarePerSeat;
@@ -119,7 +122,7 @@ public class RideCreateActivity extends AppCompatActivity {
         // Buttons
         btnDepartureTime = findViewById(R.id.btnDepartureTime);
         btnBack = findViewById(R.id.btnBack);
-        btnCreate = findViewById(R.id.btnCreate);
+        btnCreate = findViewById(R.id.btnRideCreate);
         btnFromMap = findViewById(R.id.btnFromMap); // New
         btnToMap = findViewById(R.id.btnToMap);     // New
 
@@ -272,6 +275,7 @@ public class RideCreateActivity extends AppCompatActivity {
         if (!validateForm()) {
             return;
         }
+        Log.d(TAG, "Create btn clicked");
 
         showLoading(true);
 

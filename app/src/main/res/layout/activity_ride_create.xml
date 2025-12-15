@@ -410,7 +410,7 @@
 
                 <!-- Create Ride Button -->
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/btnCreate"
+                    android:id="@+id/btnRideCreate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -422,8 +422,8 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"
+                        android:clickable="false"
+                        android:focusable="false"
                         android:gravity="center"
                         android:orientation="horizontal"
                         android:padding="16dp">

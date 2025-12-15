@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private CardView contentCard;
 
     // Individual button views
-    private LinearLayout btnRoutine, btnAssignments, btnNotices, btnCommunity, btnEvents, btnRide;
+    private LinearLayout btnRoutine, btnAssignments, btnNotices, btnCommunity, btnEvents, btnRide, btnToLet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         btnCommunity = findViewById(R.id.btnCommunity);
         btnEvents = findViewById(R.id.btnEvents);
         btnRide = findViewById(R.id.btnRide);
+        btnToLet = findViewById(R.id.btnToLet);
 
         // Set welcome message with stored user name
         String userName = sessionManager.getUserName();
@@ -287,6 +288,9 @@ public class MainActivity extends AppCompatActivity {
         btnRide.setOnClickListener(v -> {
             navigateToRideSharingActivity();
         });
+        btnToLet.setOnClickListener(v -> {
+            navigateToRentActivity();
+        });
 
         etSearch.setOnClickListener(v -> showToast("Search opened"));
     }
@@ -328,6 +332,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void navigateToRideSharingActivity() {
         Intent intent = new Intent(MainActivity.this, RideSharingActivity.class);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
+    }
+    private void navigateToRentActivity() {
+        Intent intent = new Intent(MainActivity.this, RentActivity.class);
         startActivity(intent);
         overridePendingTransition(0, 0);
     }
